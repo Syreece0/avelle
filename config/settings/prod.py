@@ -29,8 +29,10 @@ SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
 
 # --- Static files (WhiteNoise) and media (Cloudinary) ----------------------
-# 'cloudinary_storage' must come before 'django.contrib.staticfiles'.
-INSTALLED_APPS = ["cloudinary_storage", *INSTALLED_APPS, "cloudinary"]
+# Static files are served by WhiteNoise, so 'cloudinary_storage' is NOT listed as an installed app: its
+# collectstatic override reads the STATICFILES_STORAGE setting, which Django 5.1+ removed, and it would break
+# the build. Its MediaCloudinaryStorage class (below) works without being installed.
+INSTALLED_APPS = [*INSTALLED_APPS, "cloudinary"]
 
 STORAGES = {
     "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},

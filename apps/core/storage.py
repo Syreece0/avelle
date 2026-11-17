@@ -13,7 +13,13 @@ from django.utils.deconstruct import deconstructible
 class CloudinaryAnyMediaStorage(Storage):
     LARGE = 20 * 1024 * 1024  # larger files are sent in chunks
 
+    @staticmethod
+    def _configure():
+        # Importing this module applies the CLOUDINARY_STORAGE settings to the cloudinary SDK.
+        from cloudinary_storage import app_settings  # noqa: F401
+
     def _save(self, name, content):
+        self._configure()
         import cloudinary.uploader
 
         content.seek(0)
@@ -31,6 +37,7 @@ class CloudinaryAnyMediaStorage(Storage):
         return name
 
     def url(self, name):
+        self._configure()
         from cloudinary.utils import cloudinary_url
 
         kind, _, public_id = str(name).partition(":")
@@ -42,6 +49,7 @@ class CloudinaryAnyMediaStorage(Storage):
         return cloudinary_url(public_id, **options)[0]
 
     def delete(self, name):
+        self._configure()
         import cloudinary.uploader
 
         kind, _, public_id = str(name).partition(":")

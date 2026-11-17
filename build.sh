@@ -2,6 +2,10 @@
 # Render build step: install, fetch GSAP (optional), collect static files, migrate.
 set -o errexit
 
+# manage.py defaults to the development settings; the build must use production settings so that
+# collectstatic writes the fingerprinted files and manifest the live site expects.
+export DJANGO_SETTINGS_MODULE=config.settings.prod
+
 pip install --upgrade pip
 pip install -r requirements.txt
 

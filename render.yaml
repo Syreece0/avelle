@@ -5,7 +5,7 @@ services:
     name: avelle
     runtime: python
     plan: starter
-    buildCommand: ./build.sh
+    buildCommand: bash build.sh
     startCommand: gunicorn config.wsgi:application --workers 3 --timeout 180 --access-logfile -
     healthCheckPath: /healthz/
     envVars:
