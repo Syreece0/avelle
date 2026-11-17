@@ -1,0 +1,122 @@
+/* ==========================================================================
+   AVELLE design tokens (storefront)
+   Brand palette is fixed. Derived tokens exist only to meet WCAG contrast:
+     --grey-text  : warm grey darkened so small text passes 4.5:1 on ivory
+     --gold-text  : gold darkened for text on light surfaces (brand gold is 2.5:1)
+   Use brand gold for hairlines, icons and dark surfaces; never for small text
+   on ivory/white.
+   Breakpoints (CSS variables cannot be used in media queries):
+     sm 640px | md 900px | lg 1200px
+   ========================================================================== */
+:root {
+  /* Brand palette */
+  --ivory: #F8F6F1;
+  --champagne: #E9E1D5;
+  --ink: #171717;
+  --grey: #77736D;
+  --gold: #B69A68;
+  --white: #FFFFFF;
+  --line: #E8E3DB;
+
+  /* Derived (accessibility) */
+  --ink-soft: #3A3835;
+  --grey-text: #625E57;
+  --gold-text: #6F5A2E;
+  --gold-soft: #EFE7D6;
+
+  /* Feedback */
+  --danger: #9B2C2C;
+  --danger-soft: #F6E4E1;
+  --success: #2F6B4F;
+  --success-soft: #E2EFE8;
+  --warning: #8A5A12;
+  --warning-soft: #F5EAD3;
+
+  /* Semantic */
+  --bg: var(--ivory);
+  --surface: var(--white);
+  --text: var(--ink);
+  --text-muted: var(--grey-text);
+  --border: var(--line);
+  --focus: var(--ink);
+
+  /* Typography */
+  --font-serif: "Cormorant Garamond", "Cormorant", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --display-sm: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  --display-md: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
+  --display-lg: clamp(3rem, 1.8rem + 5vw, 6.5rem);
+
+  --tracking-wide: 0.12em;
+  --tracking-wider: 0.22em;
+  --tracking-brand: 0.46em;
+
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7rem;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  --container: 1360px;
+  --container-narrow: 760px;
+
+  /* Radii: restrained, consistent */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-card: 14px;
+  --radius-pill: 999px;
+
+  /* Elevation. Warm-tinted, layered; "float" is the product-card shadow. */
+  --shadow-sm: 0 1px 2px rgba(23, 23, 23, 0.05);
+  --shadow-md: 0 6px 20px -8px rgba(23, 23, 23, 0.14);
+  --shadow-overlay: 0 24px 60px -20px rgba(23, 23, 23, 0.35);
+  --shadow-float:
+    0 1px 2px rgba(23, 23, 23, 0.04),
+    0 10px 24px -10px rgba(23, 23, 23, 0.10),
+    0 28px 48px -28px rgba(23, 23, 23, 0.14);
+  --shadow-float-active:
+    0 2px 4px rgba(23, 23, 23, 0.05),
+    0 18px 36px -12px rgba(23, 23, 23, 0.16),
+    0 44px 70px -30px rgba(23, 23, 23, 0.24);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur: 280ms;
+  --dur-slow: 520ms;
+
+  /* Layering */
+  --z-header: 100;
+  --z-dropdown: 200;
+  --z-drawer: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  --header-h: 72px;
+  color-scheme: light;
+}
+
+@media (max-width: 899px) {
+  :root { --header-h: 60px; }
+}
+
+/* Reduced motion: collapse durations; JS also checks the media query. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+}

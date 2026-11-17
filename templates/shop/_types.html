@@ -1,0 +1,7 @@
+{% if result.types %}
+<ul class="shop-types" aria-label="{{ result.root.name }} categories">
+  {% for t in result.types %}
+    <li><a class="shop-type{% if t.selected %} is-active{% endif %}{% if not t.count and not t.selected %} is-empty{% endif %}" href="{{ t.href }}" data-shop-link{% if t.selected %} aria-current="true"{% endif %}>{{ t.name }} <span class="shop-type__n">{{ t.count }}</span></a></li>
+  {% endfor %}
+</ul>
+{% endif %}

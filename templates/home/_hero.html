@@ -1,0 +1,30 @@
+{% load avelle_ui %}
+{# Cinematic hero. Title lines come from the admin (separated by "|"); each line is masked for the reveal. #}
+<section class="hero{% if not hero.image %} hero--typographic{% endif %}" data-hero aria-labelledby="hero-title">
+  <div class="hero__media"{% if hero.image and not hero.is_video %} style="--hero-url: url('{{ hero.image.url|cdn:1200 }}')"{% endif %} data-parallax="0.06" data-parallax-trigger="hero">
+    {% if hero.image and hero.is_video %}
+      <video class="hero__img" src="{{ hero.image.url }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true" data-hero-video></video>
+    {% elif hero.image %}
+      <img class="hero__img" src="{{ hero.image.url|cdn:1920 }}" alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
+    {% endif %}
+  </div>
+  <div class="hero__veil"></div>
+  <span class="hero__ghost" aria-hidden="true" data-hero-ghost>AVELLE</span>
+
+  <div class="container hero__inner">
+    <p class="eyebrow hero__eyebrow" data-hero-item>{{ hero.eyebrow }}</p>
+    <h1 class="display hero__title" id="hero-title">
+      {% for line in hero.lines %}<span class="line"><span class="line__inner" data-hero-line>{{ line }}</span></span>{% endfor %}
+    </h1>
+    <p class="lead hero__lead" data-hero-item>{{ hero.body }}</p>
+    {% if collections %}
+      <div class="hero__cta" data-hero-item>
+        {% for item in collections|slice:":2" %}
+          <a class="btn btn--lg {% if forloop.first %}btn--light{% else %}btn--outline-light{% endif %}" href="/shop/?category={{ item.category.slug }}">Shop {{ item.category.name }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <a class="hero__scroll" href="#intro" data-hero-item><span>Scroll</span><span class="hero__scroll-line" aria-hidden="true"></span></a>
+</section>

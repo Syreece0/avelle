@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AVELLE Style Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/product-card.css">
+  <link rel="stylesheet" href="showcase.css">
+</head>
+<body data-icons="../img/icons.svg">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="announce">Complimentary delivery on orders over &#8358;150,000</div>
+
+<header class="site-header">
+  <div class="container">
+    <div class="site-header__bar">
+      <div class="site-header__left">
+        <button class="icon-btn site-header__menu-btn" type="button" data-dialog-open="mobile-nav" aria-label="Open menu"><svg class="icon"><use href="../img/icons.svg#i-menu"/></svg></button>
+        <nav class="primary-nav" aria-label="Collections">
+          <div class="primary-nav__item">
+            <a class="primary-nav__link" href="#">Men</a>
+            <div class="mega"><div class="container mega__inner"><p class="mega__title">Men</p>
+              <ul class="mega__list"><li><a href="#">View all</a></li><li><a href="#">Shirts</a></li><li><a href="#">T-shirts</a></li><li><a href="#">Trousers</a></li><li><a href="#">Jeans</a></li><li><a href="#">Jackets</a></li><li><a href="#">Hoodies</a></li><li><a href="#">Traditional wear</a></li><li><a href="#">Shoes</a></li></ul></div></div>
+          </div>
+          <div class="primary-nav__item"><a class="primary-nav__link" href="#">Women</a></div>
+          <div class="primary-nav__item"><a class="primary-nav__link" href="#">Children</a></div>
+          <div class="primary-nav__item"><a class="primary-nav__link" href="#">New in</a></div>
+        </nav>
+      </div>
+      <a class="wordmark" href="#" aria-label="AVELLE">AVELLE</a>
+      <div class="site-header__right">
+        <button class="icon-btn" type="button" data-toggle="search-panel" aria-expanded="false" aria-controls="search-panel" aria-label="Search"><svg class="icon"><use href="../img/icons.svg#i-search"/></svg></button>
+        <a class="icon-btn hide-mobile" href="#" aria-label="Account"><svg class="icon"><use href="../img/icons.svg#i-user"/></svg></a>
+        <a class="icon-btn hide-mobile" href="#" aria-label="Wishlist"><svg class="icon"><use href="../img/icons.svg#i-heart"/></svg></a>
+        <a class="icon-btn" href="#" aria-label="Bag, 2 items"><svg class="icon"><use href="../img/icons.svg#i-bag"/></svg><span class="icon-btn__count">2</span></a>
+      </div>
+    </div>
+  </div>
+  <div id="search-panel" class="search-panel" hidden><div class="container">
+    <form class="search-panel__form" action="#" role="search" onsubmit="return false"><label class="sr-only" for="s">Search</label><input id="s" class="search-panel__input" type="search" placeholder="Search products, categories, brands"><button class="btn btn--sm" type="submit">Search</button></form>
+  </div></div>
+</header>
+
+<dialog id="mobile-nav" class="drawer" aria-label="Menu">
+  <div class="drawer__head"><a class="wordmark" href="#">AVELLE</a><button class="icon-btn" type="button" data-dialog-close aria-label="Close menu"><svg class="icon"><use href="../img/icons.svg#i-close"/></svg></button></div>
+  <nav class="drawer__nav" aria-label="Mobile">
+    <details open><summary>Men <svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></summary><ul><li><a href="#">View all Men</a></li><li><a href="#">Shirts</a></li><li><a href="#">Trousers</a></li></ul></details>
+    <details><summary>Women <svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></summary><ul><li><a href="#">View all Women</a></li><li><a href="#">Dresses</a></li></ul></details>
+    <details><summary>Children <svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></summary><ul><li><a href="#">View all Children</a></li></ul></details>
+    <div class="drawer__links"><a href="#"><svg class="icon"><use href="../img/icons.svg#i-user"/></svg> Account</a><a href="#"><svg class="icon"><use href="../img/icons.svg#i-heart"/></svg> Wishlist</a></div>
+  </nav>
+</dialog>
+
+<main id="main">
+  <section class="sg-section">
+    <div class="container stack">
+      <span class="eyebrow">AVELLE design system &middot; storefront</span>
+      <h1>Quiet luxury, <em>made interactive.</em></h1>
+      <p class="lead">Tokens, components and the floating product card. Everything below is live: hover the cards, open the filters, try the modal and toasts. Resize the window to check responsive behaviour.</p>
+      <p><a class="btn btn--secondary btn--sm" href="dashboard.html">Dashboard style guide</a></p>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <div class="container">
+      <h2>Colour</h2>
+      <p class="sg-note">Brand colours are exact. Two derived tokens exist only for accessibility: brand gold is 2.5:1 on ivory, so gold-toned <em>text</em> uses <code>--gold-text</code>; warm grey is 4.4:1 on ivory, so small secondary text uses <code>--grey-text</code>.</p>
+      <div class="sg-swatches">
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#F8F6F1;border-bottom:1px solid var(--line)"></div><div class="sg-swatch__meta"><strong>Warm Ivory</strong>#F8F6F1 &middot; page</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#E9E1D5"></div><div class="sg-swatch__meta"><strong>Champagne Beige</strong>#E9E1D5 &middot; bands</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#171717"></div><div class="sg-swatch__meta"><strong>Near Black</strong>#171717 &middot; text, buttons</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#77736D"></div><div class="sg-swatch__meta"><strong>Warm Grey</strong>#77736D &middot; large text, icons</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#B69A68"></div><div class="sg-swatch__meta"><strong>Muted Gold</strong>#B69A68 &middot; accents</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#FFFFFF;border-bottom:1px solid var(--line)"></div><div class="sg-swatch__meta"><strong>White</strong>#FFFFFF &middot; cards</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#E8E3DB"></div><div class="sg-swatch__meta"><strong>Border</strong>#E8E3DB &middot; hairlines</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#6B675F"></div><div class="sg-swatch__meta"><strong>Grey text</strong>#6B675F &middot; 5.2:1 on ivory</div></div>
+        <div class="sg-swatch"><div class="sg-swatch__chip" style="background:#7D6638"></div><div class="sg-swatch__meta"><strong>Gold text</strong>#7D6638 &middot; 5.1:1 on ivory</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <div class="container">
+      <h2>Brand and typography</h2>
+      <div class="sg-cols">
+        <div class="sg-panel" style="display:grid;place-items:center;min-height:200px"><span class="wordmark wordmark--lg">AVELLE</span></div>
+        <div class="sg-dark" style="display:grid;place-items:center;min-height:200px"><span class="wordmark wordmark--lg wordmark--light">AVELLE</span></div>
+      </div>
+      <div class="sg-type" style="margin-top:var(--space-6)">
+        <p class="eyebrow">Eyebrow &middot; Inter, tracked</p>
+        <p class="display">Display <em>Serif</em></p>
+        <h1>Heading one, Cormorant Garamond</h1>
+        <h2>Heading two for sections</h2>
+        <h3>Heading three for cards and panels</h3>
+        <p class="lead">Lead paragraph in Inter. Clean, modern sans-serif for all body content keeps long product descriptions and policies easy to read.</p>
+        <p class="muted">Muted body text uses the darker grey token so it stays readable. <span class="price">&#8358;125,000</span> prices use tabular figures.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <div class="container">
+      <h2>Buttons</h2>
+      <div class="sg-row">
+        <a class="btn" href="#">Primary</a>
+        <a class="btn btn--secondary" href="#">Secondary</a>
+        <a class="btn btn--accent" href="#">Accent</a>
+        <a class="btn btn--ghost" href="#">Ghost link</a>
+        <a class="btn btn--danger" href="#">Danger</a>
+        <button class="btn" disabled>Disabled</button>
+        <button class="btn is-loading" type="button">Loading</button>
+      </div>
+      <div class="sg-row">
+        <a class="btn btn--sm" href="#">Small</a>
+        <a class="btn btn--lg" href="#">Large <svg class="icon icon--sm"><use href="../img/icons.svg#i-arrow-right"/></svg></a>
+        <button class="icon-btn" type="button" aria-label="Search"><svg class="icon"><use href="../img/icons.svg#i-search"/></svg></button>
+        <button class="icon-btn" type="button" aria-label="Wishlist"><svg class="icon"><use href="../img/icons.svg#i-heart"/></svg></button>
+      </div>
+      <div class="sg-dark" style="margin-top:var(--space-5)"><div class="sg-row" style="margin:0">
+        <a class="btn btn--light" href="#">Light on dark</a><a class="btn btn--outline-light" href="#">Outline on dark</a>
+      </div></div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <div class="container">
+      <h2>Filters, chips and badges</h2>
+      <p class="sg-note">Dropdown filters are keyboard-operable, close on Escape and outside click, and anchor to the screen edges on phones.</p>
+      <div class="toolbar" style="margin-top:var(--space-4)">
+        <div class="dropdown" data-dropdown><button class="dropdown__trigger" type="button" aria-expanded="false" aria-controls="dd-size">Size <span class="dropdown__count">2</span><svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></button>
+          <div class="dropdown__panel" id="dd-size" hidden><label class="check"><input type="checkbox" checked><span>S</span></label><label class="check"><input type="checkbox" checked><span>M</span></label><label class="check"><input type="checkbox"><span>L</span></label><label class="check"><input type="checkbox"><span>XL</span></label></div></div>
+        <div class="dropdown" data-dropdown><button class="dropdown__trigger" type="button" aria-expanded="false" aria-controls="dd-colour">Colour<svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></button>
+          <div class="dropdown__panel" id="dd-colour" hidden><label class="check"><input type="checkbox"><span>Black</span></label><label class="check"><input type="checkbox"><span>Ivory</span></label><label class="check"><input type="checkbox"><span>Camel</span></label></div></div>
+        <div class="dropdown" data-dropdown><button class="dropdown__trigger" type="button" aria-expanded="false" aria-controls="dd-price">Price<svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></button>
+          <div class="dropdown__panel" id="dd-price" hidden><label class="check"><input type="radio" name="p"><span>Under &#8358;25,000</span></label><label class="check"><input type="radio" name="p"><span>&#8358;25,000 to &#8358;75,000</span></label><label class="check"><input type="radio" name="p"><span>Over &#8358;75,000</span></label></div></div>
+        <span class="toolbar__spacer"></span>
+        <span class="toolbar__count">128 products</span>
+        <div class="dropdown" data-dropdown><button class="dropdown__trigger" type="button" aria-expanded="false" aria-controls="dd-sort">Sort: Newest<svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></button>
+          <div class="dropdown__panel dropdown__panel--right" id="dd-sort" hidden><button class="dropdown__option" type="button" role="menuitemradio" aria-checked="true">Newest</button><button class="dropdown__option" type="button">Price: low to high</button><button class="dropdown__option" type="button">Price: high to low</button></div></div>
+      </div>
+      <div class="chips"><span class="chip">Women <button class="chip__remove" type="button" aria-label="Remove filter Women"><svg class="icon"><use href="../img/icons.svg#i-close"/></svg></button></span><span class="chip">Size M <button class="chip__remove" type="button" aria-label="Remove filter Size M"><svg class="icon"><use href="../img/icons.svg#i-close"/></svg></button></span><button class="chip chip--clear" type="button">Clear all</button></div>
+      <div class="sg-row"><span class="badge badge--ink">New</span><span class="badge badge--gold">-20%</span><span class="badge badge--muted">Sold out</span><span class="badge">Low stock</span></div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <div class="container">
+      <h2>Forms</h2>
+      <div class="sg-cols">
+        <form class="sg-panel" onsubmit="return false">
+          <div class="form-row form-row--2">
+            <div class="field"><label class="field__label" for="f1">First name <span class="req">*</span></label><input id="f1" class="input" placeholder="Ada"></div>
+            <div class="field has-error"><label class="field__label" for="f2">Phone <span class="req">*</span></label><input id="f2" class="input" value="0801" aria-invalid="true"><p class="field__error" role="alert">Enter a valid Nigerian phone number.</p></div>
+          </div>
+          <div class="field"><label class="field__label" for="f3">State</label><select id="f3" class="select"><option>Lagos</option><option>Abuja</option></select><p class="field__help">Delivery charges are set per state.</p></div>
+          <div class="field"><label class="field__label" for="f4">Delivery note</label><textarea id="f4" class="textarea" placeholder="Landmark or instructions"></textarea></div>
+          <label class="check"><input type="checkbox" checked><span>Save this address</span></label>
+          <label class="check"><input type="radio" name="d" checked><span>Standard delivery</span></label>
+          <label class="check"><input type="radio" name="d"><span>Pick-up</span></label>
+        </form>
+        <div class="sg-panel">
+          <p class="field__label">Size</p>
+          <div class="option-group" role="radiogroup" aria-label="Size">
+            <label class="option"><input type="radio" name="sz"><span class="option__label">XS</span></label>
+            <label class="option"><input type="radio" name="sz" checked><span class="option__label">S</span></label>
+            <label class="option"><input type="radio" name="sz"><span class="option__label">M</span></label>
+            <label class="option"><input type="radio" name="sz" disabled><span class="option__label">L</span></label>
+            <label class="option"><input type="radio" name="sz"><span class="option__label">XL</span></label>
+          </div>
+          <p class="field__label" style="margin-top:var(--space-5)">Colour &middot; Camel</p>
+          <div class="option-group" role="radiogroup" aria-label="Colour">
+            <label class="option"><input type="radio" name="cl" checked aria-label="Camel"><span class="option__label swatch" style="--swatch:#B88A5A"></span></label>
+            <label class="option"><input type="radio" name="cl" aria-label="Black"><span class="option__label swatch" style="--swatch:#111"></span></label>
+            <label class="option"><input type="radio" name="cl" aria-label="Ivory"><span class="option__label swatch" style="--swatch:#F3EBDD"></span></label>
+            <label class="option"><input type="radio" name="cl" aria-label="Olive"><span class="option__label swatch" style="--swatch:#5B6236"></span></label>
+          </div>
+          <p class="field__label" style="margin-top:var(--space-5)">Quantity</p>
+          <div class="qty" data-qty><button type="button" data-qty-step="-1" aria-label="Decrease quantity"><svg class="icon"><use href="../img/icons.svg#i-minus"/></svg></button><input type="number" value="1" min="1" max="10" aria-label="Quantity"><button type="button" data-qty-step="1" aria-label="Increase quantity"><svg class="icon"><use href="../img/icons.svg#i-plus"/></svg></button></div>
+          <div class="search-field" style="margin-top:var(--space-5)"><svg class="icon"><use href="../img/icons.svg#i-search"/></svg><input class="input" type="search" placeholder="Search" aria-label="Search"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <div class="container">
+      <h2>Modal and notifications</h2>
+      <div class="sg-row">
+        <button class="btn" type="button" data-dialog-open="demo-modal">Open modal</button>
+        <button class="btn btn--secondary" type="button" id="t-ok">Success toast</button>
+        <button class="btn btn--secondary" type="button" id="t-err">Error toast</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section" style="background:var(--ivory)">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow">Floating product card</span><h2>Three layers, three animations</h2></div>
+        <div class="cluster" role="group" aria-label="Entrance direction demo">
+          <button class="btn btn--secondary btn--sm" type="button" data-demo-mode="bottom" aria-pressed="false">Bottom to top</button>
+          <button class="btn btn--secondary btn--sm" type="button" data-demo-mode="left" aria-pressed="false">Left to right</button>
+          <button class="btn btn--secondary btn--sm" type="button" data-demo-mode="right" aria-pressed="false">Right to left</button>
+          <button class="btn btn--sm" type="button" data-demo-mode="mixed" aria-pressed="true">Mixed</button>
+        </div>
+      </div>
+      <p class="sg-note">Entrance runs on the outer layer, the float on the middle layer and the pointer tilt on the inner layer, so none of them writes to the same element's transform. On touch screens the quick controls sit behind the + button and are never hover-only. Reduced-motion users get static cards.</p>
+      <ul class="product-grid" id="demo-grid"></ul>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <div class="container">
+      <h2>Empty state and loading</h2>
+      <div class="sg-cols">
+        <div class="sg-panel empty-state"><h3>Nothing matches <em>yet</em></h3><p>Try removing a filter or searching for something broader.</p><a class="btn btn--secondary btn--sm" href="#">Clear all filters</a></div>
+        <ul class="product-grid product-grid--3" style="grid-template-columns:repeat(2,1fr)" aria-label="Loading skeleton">
+          <li class="product-grid__item"><div class="pc pc--skeleton"><div class="pc__float"><article class="pc__tilt"><div class="pc__media"></div><div class="pc__body"><div class="pc__line"></div><div class="pc__line"></div></div></article></div></div></li>
+          <li class="product-grid__item"><div class="pc pc--skeleton"><div class="pc__float"><article class="pc__tilt"><div class="pc__media"></div><div class="pc__body"><div class="pc__line"></div><div class="pc__line"></div></div></article></div></div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="demo-modal" class="modal" aria-labelledby="dm-title">
+  <div class="modal__head"><h2 id="dm-title" class="modal__title">Quick view</h2><button class="icon-btn" type="button" data-dialog-close aria-label="Close"><svg class="icon"><use href="../img/icons.svg#i-close"/></svg></button></div>
+  <div class="modal__body"><p>Modals use the native dialog element: focus is trapped, Escape closes it and the page behind stays still.</p></div>
+  <div class="modal__foot"><button class="btn btn--secondary" type="button" data-dialog-close>Close</button><a class="btn" href="#">View product</a></div>
+</dialog>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about"><a class="wordmark wordmark--light" href="#">AVELLE</a><p>Considered fashion for men, women and children.</p></div>
+      <div><h3>Shop</h3><ul class="footer-list"><li><a href="#">Men</a></li><li><a href="#">Women</a></li><li><a href="#">Children</a></li><li><a href="#">New arrivals</a></li></ul></div>
+      <div><h3>Customer care</h3><ul class="footer-list"><li><a href="#">Shipping information</a></li><li><a href="#">Returns and refunds</a></li><li><a href="#">Privacy policy</a></li><li><a href="#">Terms and conditions</a></li></ul></div>
+      <div><h3>Contact</h3><ul class="footer-list"><li><a href="#">hello@avelle.example</a></li><li><a href="#">Instagram</a></li><li><a href="#">WhatsApp</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 AVELLE. All rights reserved.</span><span>Prices in Nigerian naira (NGN)</span></div>
+  </div>
+</footer>
+
+<div id="toast-region" class="toast-region" aria-live="polite"></div>
+<script src="../js/ui.js" defer></script>
+<script src="demo.js" defer></script>
+<script defer>
+  window.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("t-ok").addEventListener("click", function () { Avelle.toast({ title: "Added to bag", message: "Linen Camp Shirt, size M, Camel" }); });
+    document.getElementById("t-err").addEventListener("click", function () { Avelle.toast({ type: "error", title: "Size unavailable", message: "Size L in Camel is out of stock." }); });
+  });
+</script>
+</body>
+</html>

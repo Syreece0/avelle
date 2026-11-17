@@ -1,0 +1,28 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Products{% endblock %}
+{% block content %}
+{% url 'dashboard:product_new' as new_url %}{% include "dashboard/_page_head.html" with title="Products" subtitle="Everything in your catalogue, published or not." action_url=new_url action_label="Add product" %}
+<section class="d-card">
+  <form class="d-toolbar" method="get" role="search">
+    <div class="search-field">{% icon "search" %}<label class="sr-only" for="pq">Search products</label><input id="pq" class="input" type="search" name="q" value="{{ q }}" placeholder="Name, keyword or SKU" maxlength="80"></div>
+    <label class="sr-only" for="pc">Category</label><select id="pc" class="select" name="category" data-autosubmit style="width:auto"><option value="">All categories</option>{% for c in categories %}<option value="{{ c.pk }}"{% if c.pk|stringformat:"s" == category_id %} selected{% endif %}>{{ c.full_path }}</option>{% endfor %}</select>
+    <label class="sr-only" for="ps">Status</label><select id="ps" class="select" name="status" data-autosubmit style="width:auto"><option value="">Any status</option><option value="published"{% if status == "published" %} selected{% endif %}>Published</option><option value="draft"{% if status == "draft" %} selected{% endif %}>Draft</option></select>
+    <label class="sr-only" for="pk">Stock</label><select id="pk" class="select" name="stock" data-autosubmit style="width:auto"><option value="">Any stock</option><option value="in"{% if stock == "in" %} selected{% endif %}>In stock</option><option value="low"{% if stock == "low" %} selected{% endif %}>Low stock</option><option value="out"{% if stock == "out" %} selected{% endif %}>Out of stock</option></select>
+    <button class="btn btn--secondary btn--sm" type="submit">Filter</button>
+  </form>
+  {% if page_obj %}
+  <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Product</th><th>Category</th><th>Status</th><th>Variants</th><th>Stock</th><th class="num">Price</th></tr></thead><tbody>
+    {% for p in page_obj %}
+    <tr><td><div class="cell-product"><div class="cell-product__thumb">{% with img=p.primary_image %}{% if img %}<img src="{{ img.image.url }}" alt="" width="44" height="54" loading="lazy">{% else %}{% icon "shirt" %}{% endif %}{% endwith %}</div>
+      <div><a class="d-link cell-product__name" href="{% url 'dashboard:product_edit' p.pk %}">{{ p.name }}</a>{% if p.brand %}<div class="cell-product__sub">{{ p.brand.name }}</div>{% endif %}</div></div></td>
+      <td>{{ p.category.name }}</td>
+      <td><span class="d-badge d-badge--{% if p.status == 'published' %}paid{% else %}cancelled{% endif %}">{{ p.get_status_display }}</span></td>
+      <td>{{ p.variant_count }}</td>
+      <td>{% if p.stock %}{{ p.stock }}{% else %}<span class="d-badge d-badge--refunded">Out</span>{% endif %}</td>
+      <td class="num">{{ p.current_price|naira }}{% if p.has_discount %}<div class="cell-product__sub"><s>{{ p.price|naira }}</s></div>{% endif %}</td></tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "shirt" %}<h3>No products found</h3><p>{% if q or status or stock or category_id %}Nothing matches those filters.{% else %}Add your first product to start selling.{% endif %}</p><a class="btn" href="{% url 'dashboard:product_new' %}">Add product</a></div>{% endif %}
+</section>
+{% endblock %}

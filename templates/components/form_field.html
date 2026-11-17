@@ -1,0 +1,11 @@
+{% comment %}
+Renders one Django form field with the AVELLE field styling, help text and errors.
+  {% include "components/form_field.html" with field=form.email %}
+Widgets get their class from the form (see apps.core.forms.StyledFormMixin, added in Phase 7).
+{% endcomment %}
+<div class="field{% if field.errors %} has-error{% endif %}">
+  <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="req" aria-hidden="true">*</span>{% endif %}</label>
+  {{ field }}
+  {% if field.help_text %}<p class="field__help" id="{{ field.id_for_label }}_help">{{ field.help_text }}</p>{% endif %}
+  {% for error in field.errors %}<p class="field__error" role="alert">{{ error }}</p>{% endfor %}
+</div>

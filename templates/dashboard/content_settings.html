@@ -1,0 +1,9 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Contact & social{% endblock %}
+{% block content %}
+{% include "dashboard/_page_head.html" with title="Website content" subtitle="Contact details and social links shown in the footer and on the contact page." %}
+{% include "dashboard/_content_tabs.html" %}
+<form method="post" class="d-card" style="max-width:760px" data-loading-form><div class="d-card__body">{% csrf_token %}{% include "dashboard/_form_errors.html" %}
+  {% for field in form %}{% include "dashboard/_field.html" %}{% endfor %}
+  <div class="sticky-actions"><button class="btn" type="submit">Save</button></div></div></form>
+{% endblock %}

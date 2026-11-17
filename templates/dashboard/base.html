@@ -1,0 +1,67 @@
+{% load static avelle_ui %}<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}Dashboard{% endblock %} · AVELLE</title>
+  <script>document.documentElement.className = document.documentElement.className.replace("no-js", "js");</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  {% block extra_head %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/glass.css' %}">
+</head>
+<body class="dash" data-icons="{% static 'img/icons.svg' %}">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  {% include "dashboard/_sidebar.html" %}
+
+  <div class="dash-main">
+    <header class="dash-topbar">
+      <button class="icon-btn dash-menu-btn" type="button" data-sidebar-toggle aria-label="Open navigation">{% icon "menu" %}</button>
+      <form class="dash-topbar__search search-field" action="{% url 'dashboard:search' %}" method="get" role="search">
+        <label class="sr-only" for="dash-search">Search the dashboard</label>
+        {% icon "search" %}
+        <input id="dash-search" class="input" type="search" name="q" value="{{ q|default:'' }}" placeholder="Search orders, products, customers" maxlength="80">
+      </form>
+      <div class="dash-topbar__spacer"></div>
+      {% if can.overview %}<a class="icon-btn bell" href="{% url 'dashboard:notifications' %}" aria-label="Notifications{% if unread_notifications %}, {{ unread_notifications }} unread{% endif %}">{% icon "bell" %}{% if unread_notifications %}<span class="bell__dot" aria-hidden="true">{{ unread_notifications }}</span>{% endif %}</a>{% endif %}
+      <a class="icon-btn" href="/" target="_blank" rel="noopener" aria-label="View storefront">{% icon "home" %}</a>
+      <div class="dash-user">
+        <span class="avatar" aria-hidden="true">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
+        <span class="dash-user__name">{{ request.user.full_name }}</span>
+      </div>
+    </header>
+
+    <main id="main" class="dash-content" tabindex="-1">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  {% if messages %}
+    <ul class="toast-seed" hidden>
+      {% for message in messages %}<li data-toast-type="{{ message.tags }}">{{ message }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  {# Reusable confirm dialog for destructive actions; opened by static/js/dashboard.js for form[data-confirm] #}
+  <dialog id="confirm-dialog" class="modal modal--sm" aria-labelledby="confirm-title">
+    <div class="modal__head"><h2 id="confirm-title" class="modal__title">Are you sure?</h2></div>
+    <div class="modal__body"><p id="confirm-message" class="muted">This action cannot be undone.</p></div>
+    <div class="modal__foot">
+      <button class="btn btn--secondary" type="button" data-dialog-close>Cancel</button>
+      <button class="btn btn--danger" type="button" id="confirm-accept">Delete</button>
+    </div>
+  </dialog>
+
+  <script src="{% static 'js/ui.js' %}" defer></script>
+  <script src="{% static 'js/dashboard.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

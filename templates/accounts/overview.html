@@ -1,0 +1,13 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}My account · AVELLE{% endblock %}
+{% block account_content %}
+<div class="account__cards">
+  <article class="acard"><h2>My details</h2><p>{{ user.full_name }}<br>{{ user.email }}</p><a class="btn btn--ghost btn--sm" href="{% url 'accounts:profile' %}">Edit details</a></article>
+  <article class="acard"><h2>Default address</h2>
+    {% if default_address %}<p>{{ default_address.recipient_name }}<br>{{ default_address.line1 }}{% if default_address.line2 %}, {{ default_address.line2 }}{% endif %}<br>{{ default_address.city }}, {{ default_address.state }}</p>
+    {% else %}<p class="muted">You haven't saved an address yet.</p>{% endif %}
+    <a class="btn btn--ghost btn--sm" href="{% url 'accounts:addresses' %}">{% if default_address %}Manage addresses{% else %}Add an address{% endif %}</a></article>
+  <article class="acard"><h2>Orders</h2><p>Track your orders and review past purchases.</p><a class="btn btn--ghost btn--sm" href="{% url 'orders:list' %}">View orders</a></article>
+  <article class="acard"><h2>Wishlist</h2><p>Pieces you've saved for later.</p><a class="btn btn--ghost btn--sm" href="{% url 'wishlist:wishlist' %}">View wishlist</a></article>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% load avelle_ui %}
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a class="wordmark wordmark--light" href="/" aria-label="AVELLE, home">AVELLE</a>
+        <p>{{ site.tagline|default:"Considered fashion for men, women and children." }}</p>
+      </div>
+
+      <div>
+        <h2>Shop</h2>
+        <ul class="footer-list">
+          {% for category in nav_categories %}<li><a href="/shop/?category={{ category.slug }}">{{ category.name }}</a></li>{% endfor %}
+          <li><a href="/shop/?new=1">New arrivals</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>Customer care</h2>
+        <ul class="footer-list">
+          {% for page in info_pages %}<li><a href="/pages/{{ page.key }}/">{{ page.title }}</a></li>{% endfor %}
+          <li><a href="/accounts/login/">My account</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>Contact</h2>
+        <ul class="footer-list">
+          {% if site.contact_email %}<li><a href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a></li>{% endif %}
+          {% if site.contact_phone %}<li><a href="tel:{{ site.contact_phone }}">{{ site.contact_phone }}</a></li>{% endif %}
+          {% if site.whatsapp_number %}<li><a href="https://wa.me/{{ site.whatsapp_number }}" rel="noopener">WhatsApp</a></li>{% endif %}
+          {% if site.address %}<li>{{ site.address }}</li>{% endif %}
+        </ul>
+        <ul class="footer-list" style="margin-top: var(--space-4)">
+          {% if site.instagram_url %}<li><a href="{{ site.instagram_url }}" rel="noopener" target="_blank">Instagram</a></li>{% endif %}
+          {% if site.facebook_url %}<li><a href="{{ site.facebook_url }}" rel="noopener" target="_blank">Facebook</a></li>{% endif %}
+          {% if site.tiktok_url %}<li><a href="{{ site.tiktok_url }}" rel="noopener" target="_blank">TikTok</a></li>{% endif %}
+          {% if site.x_url %}<li><a href="{{ site.x_url }}" rel="noopener" target="_blank">X</a></li>{% endif %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; {% now "Y" %} {{ site.store_name|default:"AVELLE" }}. All rights reserved.</span>
+      <span>Prices in Nigerian naira (NGN)</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,18 @@
+<section id="newsletter" class="section section--champagne newsletter" aria-labelledby="newsletter-title">
+  <div class="container container--narrow newsletter__inner">
+    <span class="eyebrow" data-reveal="up">Newsletter</span>
+    <h2 id="newsletter-title" data-reveal="up">Be the first to <em>know</em></h2>
+    <p class="lead" data-reveal="up">New arrivals and private offers, sent sparingly. Unsubscribe whenever you like.</p>
+
+    <form class="newsletter__form" method="post" action="{% url 'content:newsletter_subscribe' %}" data-newsletter novalidate data-reveal="up">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      {# Honeypot: hidden from people and assistive tech; bots tend to fill it in. #}
+      <div class="newsletter__hp" aria-hidden="true"><label>Company<input type="text" name="company" tabindex="-1" autocomplete="off"></label></div>
+      <label class="sr-only" for="newsletter-email">Email address</label>
+      <input id="newsletter-email" class="input" type="email" name="email" required autocomplete="email" placeholder="Your email address" inputmode="email">
+      <button class="btn" type="submit">Subscribe</button>
+    </form>
+    <p class="newsletter__status" role="status" aria-live="polite" data-newsletter-status></p>
+  </div>
+</section>

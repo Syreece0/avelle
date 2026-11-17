@@ -1,0 +1,5 @@
+{% load avelle_ui %}
+{# One filter form, used inline on desktop and moved into the drawer on small screens by shop.js #}
+<form class="filters" method="get" action="{% url 'catalog:shop' %}" data-shop-form>
+{% include "shop/_filters_fields.html" %}
+</form>

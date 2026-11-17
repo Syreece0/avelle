@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}Wishlist · AVELLE{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/shop.css' %}">{% endblock %}
+{% block content %}
+<section class="section section--tight">
+  <div class="container">
+    <h1>Wishlist</h1>
+    {% if products %}
+      <p class="muted" data-wishlist-count>{{ products|length }} saved piece{{ products|length|pluralize }}</p>
+      <ul class="product-grid" data-enter="mixed" data-wishlist-grid>
+        {% for product in products %}{% include "components/product_card.html" with product=product in_wishlist=True %}{% endfor %}
+      </ul>
+    {% else %}
+      <div class="shop-empty"><h2>Nothing saved yet</h2><p>Tap the heart on any piece to keep it here for later.</p><a class="btn" href="/shop/">Browse the shop</a></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

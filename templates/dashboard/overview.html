@@ -1,0 +1,111 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Overview</h1><p>Live figures from your orders, for the last {{ data.days }} days.</p></div>
+  <div class="d-tabs" role="tablist" style="margin:0;border:0" aria-label="Period">
+    {% for p in periods %}<a class="d-tab" href="?period={{ p }}"{% if p == data.period %} aria-current="page"{% endif %}>{{ p }} days</a>{% endfor %}
+  </div>
+</div>
+
+{% if data.attention.to_fulfil or data.attention.shortfalls or data.attention.refund_flags or data.attention.pending_reviews or data.attention.low_stock %}
+<section class="d-card" style="margin-bottom:16px" aria-labelledby="att-h">
+  <div class="d-card__head"><h2 class="d-card__title" id="att-h">Needs your attention</h2></div>
+  <div class="d-card__body"><ul class="attention">
+    {% if data.attention.to_fulfil %}<li><a class="d-link" href="{% url 'dashboard:orders' %}?status=paid">{{ data.attention.to_fulfil }} paid order{{ data.attention.to_fulfil|pluralize }} waiting to be fulfilled</a></li>{% endif %}
+    {% if data.attention.shortfalls %}<li><a class="d-link" href="{% url 'dashboard:orders' %}?status=paid">{{ data.attention.shortfalls }} order{{ data.attention.shortfalls|pluralize }} with a stock shortfall: check before shipping</a></li>{% endif %}
+    {% if data.attention.refund_flags %}{% if can.payments %}<li><a class="d-link" href="{% url 'dashboard:payments' %}?status=failed">{{ data.attention.refund_flags }} duplicate or late payment{{ data.attention.refund_flags|pluralize }} need a refund</a></li>{% endif %}{% endif %}
+    {% if data.attention.low_stock %}<li><a class="d-link" href="{% url 'dashboard:inventory' %}?state=low">{{ data.attention.low_stock }} variant{{ data.attention.low_stock|pluralize }} at or below the low-stock level</a></li>{% endif %}
+    {% if data.attention.pending_reviews %}{% if can.reviews %}<li><a class="d-link" href="{% url 'dashboard:reviews' %}">{{ data.attention.pending_reviews }} review{{ data.attention.pending_reviews|pluralize }} awaiting approval</a></li>{% endif %}{% endif %}
+  </ul></div>
+</section>
+{% endif %}
+
+<div class="stat-grid stat-grid--5">
+  {% for c in data.cards %}
+  <div class="d-card stat">
+    <div class="stat__label">{% icon c.icon %} {{ c.label }}</div>
+    <div class="stat__value">{% if c.money %}{{ c.value|naira }}{% else %}{{ c.value }}{% endif %}</div>
+    <div class="stat__meta">
+      {% if c.change is None %}No earlier sales to compare
+      {% elif c.change >= 0 %}<span class="delta delta--up">&#9650; {{ c.change }}%</span> vs previous {{ data.days }} days
+      {% else %}<span class="delta delta--down">&#9660; {{ c.change }}%</span> vs previous {{ data.days }} days{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="d-grid d-grid--2-1">
+  <section class="d-card" aria-labelledby="rev-h">
+    <div class="d-card__head"><h2 class="d-card__title" id="rev-h">Revenue by day</h2><span class="muted">{{ data.bar_total|naira }} total</span></div>
+    <div class="d-card__body">
+      {% if data.has_sales %}
+      <div class="bars" role="img" aria-label="Daily revenue, last {{ data.days }} days">
+        {% for b in data.bars %}<div class="bars__col" title="{{ b.date|date:'j M' }}: {{ b.value|naira }}"><div class="bars__bar" style="--h:{{ b.pct }}%"></div></div>{% endfor %}
+      </div>
+      <div class="bars__axis"><span>{{ data.bars.0.date|date:"j M" }}</span><span>{{ data.end_date|date:"j M" }}</span></div>
+      <details class="bars__table"><summary>View as a table</summary>
+        <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Day</th><th class="num">Revenue</th></tr></thead><tbody>
+          {% for b in data.bars %}{% if b.value %}<tr><td>{{ b.date|date:"D j M" }}</td><td class="num">{{ b.value|naira }}</td></tr>{% endif %}{% endfor %}
+        </tbody></table></div>
+      </details>
+      {% else %}
+      <div class="d-empty">{% icon "chart" %}<h3>No sales in this period</h3><p>Paid orders will appear here as soon as customers check out.</p></div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="d-card" aria-labelledby="top-h">
+    <div class="d-card__head"><h2 class="d-card__title" id="top-h">Best sellers</h2></div>
+    <div class="d-card__body">
+      {% if data.top_products %}
+      <div class="bar-list">
+        {% for p in data.top_products %}
+        <div class="bar-list__row"><div class="bar-list__head"><span>{{ p.product_name }}</span><span>{{ p.revenue|naira }} · {{ p.units }} sold</span></div>
+          <div class="bar-list__track"><div class="bar-list__fill" style="--w:{{ p.pct }}%"></div></div></div>
+        {% endfor %}
+      </div>
+      {% else %}<p class="muted">No products sold in this period yet.</p>{% endif %}
+    </div>
+  </section>
+</div>
+
+<div class="d-grid d-grid--2" style="margin-top:16px">
+  <section class="d-card" aria-labelledby="st-h">
+    <div class="d-card__head"><h2 class="d-card__title" id="st-h">Orders placed by status</h2></div>
+    <div class="d-card__body"><div class="bar-list">
+      {% for s in data.status_breakdown %}
+      <div class="bar-list__row"><div class="bar-list__head"><span>{{ s.label }}</span><span>{{ s.count }}</span></div>
+        <div class="bar-list__track"><div class="bar-list__fill" style="--w:{{ s.pct }}%"></div></div></div>
+      {% endfor %}
+    </div></div>
+  </section>
+
+  <section class="d-card" aria-labelledby="ls-h">
+    <div class="d-card__head"><h2 class="d-card__title" id="ls-h">Low stock</h2>{% if can.inventory %}<a class="d-link" href="{% url 'dashboard:inventory' %}?state=low">View all</a>{% endif %}</div>
+    <div class="d-card__body">
+      {% if data.low_stock %}
+      <ul class="plain-list">
+        {% for inv in data.low_stock %}
+        <li><a class="d-link" href="{% url 'dashboard:variant_stock' inv.variant.pk %}">{{ inv.variant.product.name }}</a>
+          <span class="muted">{{ inv.variant.size.name }} · {{ inv.variant.colour.name }}</span>
+          <span class="d-badge d-badge--{% if inv.quantity == 0 %}refunded{% else %}low{% endif %}">{% if inv.quantity == 0 %}Out{% else %}{{ inv.quantity }} left{% endif %}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="muted">Every variant is above its low-stock level.</p>{% endif %}
+    </div>
+  </section>
+</div>
+
+<section class="d-card" style="margin-top:16px" aria-labelledby="rec-h">
+  <div class="d-card__head"><h2 class="d-card__title" id="rec-h">Recent orders</h2><a class="d-link" href="{% url 'dashboard:orders' %}">View all</a></div>
+  {% if data.recent_orders %}
+  <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>Status</th><th class="num">Total</th></tr></thead><tbody>
+    {% for o in data.recent_orders %}
+    <tr><td><a class="d-link" href="{% url 'dashboard:order_detail' o.order_number %}">{{ o.order_number }}</a></td><td>{{ o.customer_name }}</td><td>{{ o.created_at|date:"j M, H:i" }}</td>
+      <td>{% include "dashboard/_status.html" with status=o.status label=o.get_status_display %}</td><td class="num">{{ o.total|naira }}</td></tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="d-empty">{% icon "bag" %}<h3>No orders yet</h3><p>Orders appear here as soon as customers start checking out.</p></div>{% endif %}
+</section>
+{% endblock %}

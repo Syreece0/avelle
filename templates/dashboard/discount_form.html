@@ -1,0 +1,19 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}{% if code %}{{ code.code }}{% else %}New discount code{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head"><div><p><a class="d-link" href="{% url 'dashboard:discounts' %}">&larr; Discount codes</a></p><h1>{% if code %}{{ code.code }}{% else %}New discount code{% endif %}</h1>{% if code %}<p>{{ state|capfirst }} · used {{ code.times_used }} time{{ code.times_used|pluralize }}</p>{% endif %}</div></div>
+<form method="post" class="d-card" style="padding:0 20px" data-loading-form data-code-form>{% csrf_token %}
+  {% include "dashboard/_form_errors.html" %}
+  <div class="form-section"><div class="form-section__intro"><h2>Code</h2><p>Customers type this at checkout. It is saved in capitals.</p></div><div>{% include "dashboard/_field.html" with field=form.code %}{% include "dashboard/_field.html" with field=form.description %}</div></div>
+  <div class="form-section"><div class="form-section__intro"><h2>Value</h2><p>A percentage of the subtotal, or a fixed amount in naira.</p></div><div>{% include "dashboard/_field.html" with field=form.kind %}
+    <div data-kind-percentage>{% include "dashboard/_field.html" with field=form.percent_off %}</div><div data-kind-fixed>{% include "dashboard/_field.html" with field=form.amount_off %}</div>{% include "dashboard/_field.html" with field=form.minimum_subtotal %}</div></div>
+  <div class="form-section"><div class="form-section__intro"><h2>Limits</h2><p>When it works and how often it can be used.</p></div><div><div class="form-row">{% include "dashboard/_field.html" with field=form.starts_at %}{% include "dashboard/_field.html" with field=form.expires_at %}</div>
+    <div class="form-row">{% include "dashboard/_field.html" with field=form.usage_limit %}{% include "dashboard/_field.html" with field=form.per_user_limit %}</div>{% include "dashboard/_field.html" with field=form.is_active %}</div></div>
+  <div class="sticky-actions"><a class="btn btn--secondary" href="{% url 'dashboard:discounts' %}">Cancel</a><button class="btn" type="submit">Save code</button></div>
+</form>
+{% if code %}
+<section class="d-card" style="margin-top:20px"><div class="d-card__head"><h2 class="d-card__title">Recent uses</h2></div>
+  {% if redemptions %}<div class="d-table-wrap"><table class="d-table"><tbody>{% for r in redemptions %}<tr><td><a class="d-link" href="{% url 'dashboard:order_detail' r.order.order_number %}">{{ r.order.order_number }}</a></td><td>{{ r.email }}</td><td>{{ r.created_at|date:"j M Y" }}</td><td class="num">&minus;{{ r.amount|naira }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="d-card__body"><p class="muted">Not used yet.</p></div>{% endif %}</section>
+<form method="post" action="{% url 'dashboard:discount_delete' code.pk %}" data-confirm="Delete {{ code.code }}? Codes already used on orders are switched off instead." style="margin-top:16px">{% csrf_token %}<button class="btn btn--danger btn--sm" type="submit">Delete code</button></form>
+{% endif %}
+{% endblock %}

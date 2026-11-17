@@ -1,0 +1,14 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+{% url 'dashboard:category_new' as new_url %}{% include "dashboard/_page_head.html" with title="Categories" subtitle="Collections and clothing types. The shop menus and filters are built from these." action_url=new_url action_label="Add category" %}
+<section class="d-card">
+  {% if tree %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Name</th><th>Products</th><th>Visible</th><th class="actions"></th></tr></thead><tbody>
+    {% for node in tree %}
+    <tr><td><strong>{{ node.cat.name }}</strong></td><td>{{ node.n }}</td><td>{% if node.cat.is_active %}Yes{% else %}<span class="d-badge d-badge--cancelled">Hidden</span>{% endif %}</td><td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:category_edit' node.cat.pk %}">Edit</a></td></tr>
+      {% for child in node.children %}<tr><td style="padding-left:44px">{{ child.cat.name }}</td><td>{{ child.n }}</td><td>{% if child.cat.is_active %}Yes{% else %}<span class="d-badge d-badge--cancelled">Hidden</span>{% endif %}</td><td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:category_edit' child.cat.pk %}">Edit</a></td></tr>{% endfor %}
+    {% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="d-empty">{% icon "layers" %}<h3>No categories yet</h3><p>Start with Men, Women and Children, then add types under each.</p></div>{% endif %}
+</section>
+{% endblock %}

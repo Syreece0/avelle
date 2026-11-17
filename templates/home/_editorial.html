@@ -1,0 +1,30 @@
+{% load avelle_ui %}
+<section class="section editorial" aria-labelledby="editorial-title">
+  <div class="container editorial__grid">
+    <div class="editorial__visual">
+      <span class="editorial__word" aria-hidden="true" data-parallax="-0.16">Wear well</span>
+      <div class="editorial__img editorial__img--main" data-parallax="0.07">
+        {% if editorial.image %}
+          <img src="{{ editorial.image.url|cdn:1000 }}" alt="" width="1000" height="1300" loading="lazy" decoding="async">
+        {% else %}
+          <span class="editorial__ph">{% icon "shirt" %}</span>
+        {% endif %}
+      </div>
+      <div class="editorial__img editorial__img--detail" data-parallax="-0.14">
+        {% if editorial.detail_image %}
+          <img src="{{ editorial.detail_image.url }}" alt="" width="700" height="900" loading="lazy" decoding="async">
+        {% else %}
+          <span class="editorial__ph">{% icon "tag" %}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="editorial__copy">
+      <span class="eyebrow" data-reveal="up">{{ editorial.eyebrow }}</span>
+      <h2 id="editorial-title" data-reveal="up">{{ editorial.title }}</h2>
+      <hr class="rule rule--gold" data-reveal="up">
+      {% for paragraph in editorial.paragraphs %}<p class="lead" data-reveal="up">{{ paragraph }}</p>{% endfor %}
+      <p data-reveal="up"><a class="btn btn--secondary" href="/pages/about-us/">About AVELLE</a></p>
+    </div>
+  </div>
+</section>

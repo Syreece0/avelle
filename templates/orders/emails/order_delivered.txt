@@ -1,0 +1,10 @@
+{% autoescape off %}Hello {{ order.customer_name }},
+
+Order {{ order.order_number }} has been delivered. We hope you love it.
+
+If anything isn't right, reply to this email and we'll help.
+
+View your order: {{ site_url }}/orders/{{ order.order_number }}/
+
+AVELLE
+{% endautoescape %}

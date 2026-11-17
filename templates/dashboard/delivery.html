@@ -1,0 +1,20 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Delivery charges{% endblock %}
+{% block content %}
+{% include "dashboard/_page_head.html" with title="Delivery charges" subtitle="Charge per state. Customers can only check out to states that are switched on." %}
+{% if missing %}<div class="d-alert" style="margin-bottom:16px"><div>{{ missing|length }} Nigerian state{{ missing|length|pluralize }} {{ missing|length|pluralize:"has,have" }} no charge yet.
+  <form method="post" action="{% url 'dashboard:delivery_add_missing' %}" style="display:inline">{% csrf_token %}<button class="btn btn--secondary btn--sm" type="submit">Add them (switched off)</button></form></div></div>{% endif %}
+<form method="post" data-loading-form>{% csrf_token %}{{ formset.management_form }}
+  {% if formset.non_form_errors %}<div class="d-alert d-alert--danger">{{ formset.non_form_errors }}</div>{% endif %}
+  <section class="d-card">
+    {% if formset.forms %}<div class="d-table-wrap"><table class="d-table d-table--form"><thead><tr><th>State</th><th>Charge (₦)</th><th>Free delivery from (₦)</th><th>Days min</th><th>Days max</th><th>On</th></tr></thead><tbody>
+      {% for f in formset %}<tr>{{ f.id }}<td><strong>{{ f.instance.state }}</strong></td>
+        <td>{{ f.charge }}{% for e in f.charge.errors %}<p class="field__error">{{ e }}</p>{% endfor %}</td><td>{{ f.free_delivery_threshold }}{% for e in f.free_delivery_threshold.errors %}<p class="field__error">{{ e }}</p>{% endfor %}</td>
+        <td>{{ f.estimated_days_min }}</td><td>{{ f.estimated_days_max }}{% for e in f.estimated_days_max.errors %}<p class="field__error">{{ e }}</p>{% endfor %}{% for e in f.non_field_errors %}<p class="field__error">{{ e }}</p>{% endfor %}</td>
+        <td><label class="switch">{{ f.is_active }}<span class="sr-only">Deliver to {{ f.instance.state }}</span></label></td></tr>{% endfor %}
+    </tbody></table></div>
+    <div class="sticky-actions"><span class="muted" style="margin-right:auto">{{ active_count }} state{{ active_count|pluralize }} switched on</span><button class="btn" type="submit">Save charges</button></div>
+    {% else %}<div class="d-empty">{% icon "truck" %}<h3>No delivery zones yet</h3><p>Use “Add them” above to create all 37 states, then set charges.</p></div>{% endif %}
+  </section>
+</form>
+{% endblock %}

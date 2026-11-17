@@ -1,0 +1,15 @@
+{% autoescape off %}Hello {{ order.customer_name }},
+
+Good news: order {{ order.order_number }} is on its way.
+{% if order.courier or order.tracking_number %}
+Courier: {{ order.courier|default:"-" }}
+Tracking number: {{ order.tracking_number|default:"-" }}
+{% endif %}
+Delivering to:
+{{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}
+{{ order.city }}, {{ order.state }}
+
+Follow your order: {{ site_url }}/orders/{{ order.order_number }}/
+
+AVELLE
+{% endautoescape %}

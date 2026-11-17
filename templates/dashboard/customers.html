@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+{% include "dashboard/_page_head.html" with title="Customers" subtitle="People with an AVELLE account. Guest orders are on the Orders page." %}
+<div class="d-tabs"><a class="d-tab" href="?"{% if group == "customers" %} aria-current="page"{% endif %}>Customers</a><a class="d-tab" href="?group=team"{% if group == "team" %} aria-current="page"{% endif %}>Team</a></div>
+<section class="d-card">
+  <form class="d-toolbar" method="get" role="search">{% if group == "team" %}<input type="hidden" name="group" value="team">{% endif %}
+    <div class="search-field">{% icon "search" %}<label class="sr-only" for="cq">Search</label><input id="cq" class="input" type="search" name="q" value="{{ q }}" placeholder="Name or email" maxlength="80"></div>
+    <button class="btn btn--secondary btn--sm" type="submit">Search</button></form>
+  {% if page_obj %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Name</th><th>Role</th><th>Joined</th><th class="num">Paid orders</th><th class="num">Spent</th></tr></thead><tbody>
+    {% for c in page_obj %}<tr><td><a class="d-link" href="{% url 'dashboard:customer_detail' c.pk %}">{{ c.full_name }}</a>{% if not c.is_active %} <span class="d-badge d-badge--cancelled">Deactivated</span>{% endif %}<div class="cell-product__sub">{{ c.email }}</div></td>
+      <td>{{ c.get_role_display }}</td><td>{{ c.date_joined|date:"j M Y" }}</td><td class="num">{{ c.order_count }}</td><td class="num">{{ c.spent|default:0|naira }}</td></tr>{% endfor %}
+  </tbody></table></div>{% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "users" %}<h3>No one found</h3><p>{% if q %}Nothing matches that search.{% else %}Accounts appear here when people register.{% endif %}</p></div>{% endif %}
+</section>
+{% endblock %}

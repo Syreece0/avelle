@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}Create an account · AVELLE{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/account.css' %}">{% endblock %}
+{% block content %}
+<section class="section auth">
+  <div class="container container--narrow auth__wrap">
+    <span class="eyebrow">Join AVELLE</span>
+    <h1>Create an account</h1>
+    <p class="lead">Save favourites, keep your addresses and check out faster.</p>
+    <form method="post" class="auth__form" novalidate data-loading-form>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="auth__error" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+      <div class="auth__row">
+        {% include "components/form_field.html" with field=form.first_name %}
+        {% include "components/form_field.html" with field=form.last_name %}
+      </div>
+      {% include "components/form_field.html" with field=form.email %}
+      {% include "components/form_field.html" with field=form.phone %}
+      {% include "components/form_field.html" with field=form.password1 %}
+      {% include "components/form_field.html" with field=form.password2 %}
+      <label class="check"><input type="checkbox" name="marketing_opt_in" value="on"{% if form.marketing_opt_in.value %} checked{% endif %}><span>{{ form.marketing_opt_in.label }}</span></label>
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <button class="btn btn--block" type="submit">Create account</button>
+    </form>
+    <p class="auth__alt">Already have an account? <a href="{% url 'accounts:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Sign in</a></p>
+  </div>
+</section>
+{% endblock %}

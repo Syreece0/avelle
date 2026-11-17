@@ -1,0 +1,6 @@
+{% comment %}Only the <li> items. The <ul class="product-grid"> lives in shop.html so load-more can append.{% endcomment %}{% for product in products %}{% include "components/product_card.html" with product=product %}{% empty %}{% if f.page == 1 %}
+<li class="shop-empty" data-shop-empty>
+  <h2>Nothing matches just yet</h2>
+  <p>{% if f.q %}We couldn't find anything for “{{ f.q }}”. Check the spelling, try a shorter word, or{% else %}Try removing a filter, or{% endif %} browse everything.</p>
+  <a class="btn" href="/shop/">View all products</a>
+</li>{% endif %}{% endfor %}

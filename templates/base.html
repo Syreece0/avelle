@@ -1,0 +1,76 @@
+{% load static avelle_ui %}<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}AVELLE{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}AVELLE. Considered fashion for men, women and children.{% endblock %}">
+  <meta name="theme-color" content="#F8F6F1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <script>document.documentElement.className = document.documentElement.className.replace("no-js", "js");</script>
+  {# Hide motion targets only while motion can actually run; motion.js releases them, and a failsafe does too. #}
+  <script>
+    (function () {
+      var r = document.documentElement;
+      try {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        r.classList.add("motion-pending");
+        setTimeout(function () { r.classList.remove("motion-pending"); }, 3500);
+        if (sessionStorage.getItem("avelle-nav")) {
+          sessionStorage.removeItem("avelle-nav");
+          r.classList.add("page-entering");
+          setTimeout(function () { r.classList.remove("page-entering"); }, 1200);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap">
+
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/product-card.css' %}">
+  {% block extra_head %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/glass.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}" data-icons="{% static 'img/icons.svg' %}">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  {% if announcement %}
+    <div class="announce" role="region" aria-label="Announcement">{{ announcement.title }}</div>
+  {% endif %}
+
+  {% include "partials/_header.html" %}
+
+  <main id="main" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/_footer.html" %}
+
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  {% if messages %}
+    <ul class="toast-seed" hidden>
+      {% for message in messages %}<li data-toast-type="{{ message.tags }}">{{ message }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  {# GSAP is an enhancement: with it blocked or absent every page still renders fully. Self-hosted once `manage.py fetch_vendor` has run; otherwise the pinned CDN copy. #}
+  {% if gsap_local %}
+  <script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
+  <script src="{% static 'vendor/gsap/ScrollTrigger.min.js' %}" defer></script>
+  {% else %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  {% endif %}
+  <script src="{% static 'js/ui.js' %}" defer></script>
+  <script src="{% static 'js/hero.js' %}" defer></script>
+  <script src="{% static 'js/search.js' %}" defer></script>
+  <script src="{% static 'js/cart.js' %}" defer></script>
+  <script src="{% static 'js/motion.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

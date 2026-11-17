@@ -1,0 +1,86 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}{{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><p><a class="d-link" href="{% url 'dashboard:orders' %}">&larr; Orders</a></p>
+    <h1>{{ order.order_number }} {% include "dashboard/_status.html" with status=order.status label=order.get_status_display %}</h1>
+    <p>Placed {{ order.created_at|date:"j F Y, H:i" }}{% if order.paid_at %} · paid {{ order.paid_at|date:"j M, H:i" }}{% endif %}</p></div>
+</div>
+
+{% for h in shortfalls %}<div class="d-alert d-alert--danger" role="alert" style="margin-bottom:12px"><div><strong>Stock shortfall.</strong> {{ h.note }}</div></div>{% endfor %}
+{% for p in refund_flags %}<div class="d-alert d-alert--danger" role="alert" style="margin-bottom:12px"><div><strong>Extra payment {{ p.reference }}.</strong> Paystack charged this customer again for an order that was already settled. Refund it from the Paystack dashboard.</div></div>{% endfor %}
+
+<div class="d-grid d-grid--2-1">
+  <div class="stack">
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Items</h2></div>
+      <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Product</th><th class="num">Price</th><th class="num">Qty</th><th class="num">Total</th></tr></thead><tbody>
+        {% for i in items %}<tr><td><div class="cell-product"><div class="cell-product__thumb">{% if i.image_url %}<img src="{{ i.image_url }}" alt="" width="44" height="54" loading="lazy">{% else %}{% icon "shirt" %}{% endif %}</div>
+          <div><div class="cell-product__name">{% if i.product_id %}<a class="d-link" href="{% url 'dashboard:product_edit' i.product_id %}">{{ i.product_name }}</a>{% else %}{{ i.product_name }}{% endif %}</div><div class="cell-product__sub">{{ i.size_name }} · {{ i.colour_name }} · {{ i.sku }}</div></div></div></td>
+          <td class="num">{{ i.unit_price|naira }}</td><td class="num">{{ i.quantity }}</td><td class="num">{{ i.line_total|naira }}</td></tr>{% endfor %}
+      </tbody></table></div>
+      <div class="d-card__body"><dl class="totals">
+        <div><dt>Subtotal</dt><dd>{{ order.subtotal|naira }}</dd></div>
+        {% if order.discount_amount %}<div><dt>Discount{% if order.discount_code_text %} ({{ order.discount_code_text }}){% endif %}</dt><dd>&minus;{{ order.discount_amount|naira }}</dd></div>{% endif %}
+        <div><dt>Delivery ({{ order.delivery_zone_name|default:order.state }})</dt><dd>{% if order.delivery_charge %}{{ order.delivery_charge|naira }}{% else %}Free{% endif %}</dd></div>
+        <div class="totals__grand"><dt>Total</dt><dd>{{ order.total|naira }}</dd></div>
+      </dl></div>
+    </section>
+
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Payments</h2></div>
+      {% if payments %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Reference</th><th>Status</th><th>Channel</th><th class="num">Amount</th></tr></thead><tbody>
+        {% for p in payments %}<tr><td>{{ p.reference }}<div class="cell-product__sub">{{ p.created_at|date:"j M, H:i" }}{% if p.gateway_response %} · {{ p.gateway_response }}{% endif %}</div></td>
+          <td><span class="d-badge d-badge--{% if p.status == 'success' %}paid{% elif p.status == 'failed' %}refunded{% else %}pending{% endif %}">{{ p.get_status_display }}</span></td><td>{{ p.channel|default:"-" }}</td><td class="num">{{ p.amount|naira }}</td></tr>
+          {% for r in p.refunds.all %}<tr><td colspan="3" class="cell-product__sub">&#8627; Refund {{ r.get_status_display|lower }}{% if r.reason %}: {{ r.reason }}{% endif %}</td><td class="num">&minus;{{ r.amount|naira }}</td></tr>{% endfor %}
+        {% endfor %}
+      </tbody></table></div>{% else %}<div class="d-card__body"><p class="muted">No payment has been attempted yet.</p></div>{% endif %}
+    </section>
+
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">History</h2></div>
+      <div class="d-card__body"><ol class="timeline">
+        {% for h in history %}<li><strong>{{ h.get_to_status_display }}</strong>{% if h.note %}: {{ h.note }}{% endif %}<div class="cell-product__sub">{{ h.created_at|date:"j M Y, H:i" }}{% if h.changed_by %} · {{ h.changed_by.full_name }}{% endif %}</div></li>{% endfor %}
+      </ol></div>
+    </section>
+  </div>
+
+  <div class="stack">
+    {% if status_form %}
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Update status</h2></div><div class="d-card__body">
+      <form method="post" action="{% url 'dashboard:order_status' order.order_number %}" data-loading-form data-ship-form>{% csrf_token %}
+        {% include "dashboard/_form_errors.html" with form=status_form %}
+        {% include "dashboard/_field.html" with field=status_form.status %}
+        <div data-ship-fields hidden>{% include "dashboard/_field.html" with field=status_form.courier %}{% include "dashboard/_field.html" with field=status_form.tracking_number %}</div>
+        {% include "dashboard/_field.html" with field=status_form.note %}
+        <button class="btn" type="submit">Update order</button>
+      </form></div></section>
+    {% elif order.status == "refunded" or order.status == "cancelled" %}
+    <section class="d-card"><div class="d-card__body"><p class="muted">This order is {{ order.get_status_display|lower }}. No further changes are possible.</p></div></section>
+    {% endif %}
+
+    {% if tracking_form %}
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Tracking</h2></div><div class="d-card__body">
+      <form method="post" action="{% url 'dashboard:order_tracking' order.order_number %}">{% csrf_token %}
+        {% include "dashboard/_field.html" with field=tracking_form.courier %}{% include "dashboard/_field.html" with field=tracking_form.tracking_number %}
+        <button class="btn btn--secondary" type="submit">Save tracking</button></form></div></section>
+    {% endif %}
+
+    {% if refund_form %}
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Refund</h2></div><div class="d-card__body">
+      <p class="muted">Up to {{ refundable|naira }} is still refundable. This sends the refund to Paystack straight away.</p>
+      <form method="post" action="{% url 'dashboard:order_refund' order.order_number %}" data-confirm="Send this refund to Paystack? It can't be recalled.">{% csrf_token %}
+        {% include "dashboard/_form_errors.html" with form=refund_form %}
+        {% include "dashboard/_field.html" with field=refund_form.amount %}{% include "dashboard/_field.html" with field=refund_form.reason %}{% include "dashboard/_field.html" with field=refund_form.restock %}
+        <button class="btn btn--danger" type="submit">Refund</button></form></div></section>
+    {% endif %}
+
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Customer</h2></div><div class="d-card__body">
+      <p><strong>{{ order.customer_name }}</strong><br>{{ order.email }}<br>{{ order.phone }}</p>
+      {% if order.user_id %}<p><a class="d-link" href="{% url 'dashboard:customer_detail' order.user_id %}">View account</a></p>{% else %}<p class="muted">Guest checkout</p>{% endif %}
+    </div></section>
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Deliver to</h2></div><div class="d-card__body">
+      <address>{{ order.address_line1 }}{% if order.address_line2 %}<br>{{ order.address_line2 }}{% endif %}<br>{{ order.city }}, {{ order.state }}{% if order.landmark %}<br>Near {{ order.landmark }}{% endif %}</address>
+      {% if order.delivery_note %}<p class="muted">Note: {{ order.delivery_note }}</p>{% endif %}
+      {% if order.courier or order.tracking_number %}<p>{{ order.courier }} {{ order.tracking_number }}</p>{% endif %}
+    </div></section>
+  </div>
+</div>
+{% endblock %}

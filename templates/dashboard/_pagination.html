@@ -1,0 +1,14 @@
+{% comment %}Needs page_obj; optional qs (query string without page).{% endcomment %}
+{% if page_obj.paginator.count %}
+<div class="d-pagination">
+  <span>Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav class="d-pagination__pages" aria-label="Pages">
+    {% if page_obj.has_previous %}<a class="page-btn" href="?{% if qs %}{{ qs }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous page">&lsaquo;</a>{% endif %}
+    <span class="page-btn" aria-current="page">{{ page_obj.number }}</span>
+    <span class="page-btn" style="border:0">of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="page-btn" href="?{% if qs %}{{ qs }}&amp;{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next page">&rsaquo;</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endif %}

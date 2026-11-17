@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Promotions{% endblock %}
+{% block content %}
+{% url 'dashboard:promotion_new' as new_url %}{% include "dashboard/_page_head.html" with title="Promotions" subtitle="Banners shown on the homepage while they are live." action_url=new_url action_label="New promotion" %}
+<section class="d-card">
+  {% if promos %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Banner</th><th>Schedule</th><th>Order</th><th>Status</th><th class="actions"></th></tr></thead><tbody>
+    {% for p in promos %}<tr><td><div class="cell-product"><div class="cell-product__thumb"><img src="{{ p.image.url }}" alt="" width="44" height="54" loading="lazy"></div><div><div class="cell-product__name">{{ p.title }}</div><div class="cell-product__sub">{{ p.subtitle }}</div></div></div></td>
+      <td>{% if p.starts_at %}{{ p.starts_at|date:"j M" }}{% else %}Now{% endif %} to {% if p.ends_at %}{{ p.ends_at|date:"j M Y" }}{% else %}no end{% endif %}</td><td>{{ p.position }}</td>
+      <td>{% if p.is_live %}<span class="d-badge d-badge--paid">Live</span>{% else %}<span class="d-badge d-badge--cancelled">Not live</span>{% endif %}</td><td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:promotion_edit' p.pk %}">Edit</a></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="d-empty">{% icon "image" %}<h3>No promotions</h3><p>Add a banner to feature a sale or collection on the homepage.</p></div>{% endif %}
+</section>
+{% endblock %}

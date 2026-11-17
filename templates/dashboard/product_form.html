@@ -1,0 +1,69 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}{% if product.pk %}{{ product.name }}{% else %}New product{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head"><div><p><a class="d-link" href="{% url 'dashboard:products' %}">&larr; Products</a></p><h1>{% if product.pk %}{{ product.name }}{% else %}New product{% endif %}</h1>
+  {% if product.pk %}<p>{{ product.get_status_display }}{% if product.status == "published" %} · <a class="d-link" href="{{ product.get_absolute_url }}" target="_blank" rel="noopener">View in shop</a>{% endif %}</p>{% endif %}</div></div>
+
+<form method="post" class="d-card" style="padding:0 20px" data-loading-form>{% csrf_token %}
+  {% include "dashboard/_form_errors.html" %}
+  <div class="form-section"><div class="form-section__intro"><h2>Basics</h2><p>What customers see at the top of the product page.</p></div>
+    <div>{% include "dashboard/_field.html" with field=form.name %}{% include "dashboard/_field.html" with field=form.category %}{% include "dashboard/_field.html" with field=form.brand %}{% include "dashboard/_field.html" with field=form.short_description %}{% include "dashboard/_field.html" with field=form.description %}{% include "dashboard/_field.html" with field=form.keywords %}</div></div>
+  <div class="form-section"><div class="form-section__intro"><h2>Pricing</h2><p>Prices are in naira. Set a sale price to show a discount badge.</p></div>
+    <div class="form-row">{% include "dashboard/_field.html" with field=form.price %}{% include "dashboard/_field.html" with field=form.discount_price %}</div></div>
+  <div class="form-section"><div class="form-section__intro"><h2>Visibility</h2><p>Drafts stay hidden from the shop.</p></div>
+    <div>{% include "dashboard/_field.html" with field=form.status %}{% include "dashboard/_field.html" with field=form.is_featured %}{% include "dashboard/_field.html" with field=form.is_new_arrival %}</div></div>
+  <div class="sticky-actions"><a class="btn btn--secondary" href="{% url 'dashboard:products' %}">Cancel</a><button class="btn" type="submit">{% if product.pk %}Save changes{% else %}Create product{% endif %}</button></div>
+</form>
+
+{% if product.pk %}
+<section class="d-card" id="images" style="margin-top:20px"><div class="d-card__head"><h2 class="d-card__title">Images</h2></div><div class="d-card__body">
+  {% if images %}<div class="thumb-grid thumb-grid--lg">
+    {% for img in images %}
+    <figure class="thumb-card"><div class="thumb"><img src="{{ img.image.url }}" alt="{{ img.alt_text }}" loading="lazy">{% if img.is_primary %}<span class="thumb__tag d-badge d-badge--paid">Main</span>{% endif %}</div>
+      <div class="thumb-card__actions">
+        {% if not img.is_primary %}<form method="post" action="{% url 'dashboard:product_images' product.pk %}">{% csrf_token %}<input type="hidden" name="action" value="primary"><input type="hidden" name="image" value="{{ img.pk }}"><button class="btn btn--secondary btn--sm" type="submit">Make main</button></form>{% endif %}
+        <form method="post" action="{% url 'dashboard:product_images' product.pk %}" data-confirm="Remove this image?">{% csrf_token %}<input type="hidden" name="action" value="delete"><input type="hidden" name="image" value="{{ img.pk }}"><button class="btn btn--ghost btn--sm" type="submit">Remove</button></form>
+      </div>
+      {% if img.colour %}<figcaption class="cell-product__sub">{{ img.colour.name }}</figcaption>{% endif %}</figure>
+    {% endfor %}</div>{% else %}<p class="muted">No images yet. Products without images show a placeholder in the shop.</p>{% endif %}
+  <form method="post" enctype="multipart/form-data" action="{% url 'dashboard:product_images' product.pk %}" style="margin-top:20px" data-loading-form>{% csrf_token %}
+    <input type="hidden" name="action" value="upload">
+    {% include "dashboard/_form_errors.html" with form=image_form %}
+    {% include "dashboard/_field.html" with field=image_form.images %}{% include "dashboard/_field.html" with field=image_form.colour %}
+    <button class="btn btn--secondary" type="submit">Upload</button></form>
+</div></section>
+
+<section class="d-card" id="variants" style="margin-top:20px"><div class="d-card__head"><h2 class="d-card__title">Variants and stock</h2></div><div class="d-card__body">
+  {% if variants %}
+  <form method="post" action="{% url 'dashboard:variants_save' product.pk %}" data-loading-form>{% csrf_token %}
+    {{ variant_formset.management_form }}
+    {% if variant_formset.non_form_errors %}<div class="d-alert d-alert--danger">{{ variant_formset.non_form_errors }}</div>{% endif %}
+    <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Size</th><th>Colour</th><th>SKU</th><th>Stock</th><th>Price override (₦)</th><th>On sale</th></tr></thead><tbody>
+      {% for f in variant_formset %}
+      <tr>{{ f.id }}<td>{{ f.instance.size.name }}</td><td>{{ f.instance.colour.name }}</td><td>{{ f.instance.sku }}</td>
+        <td><a class="d-link" href="{% url 'dashboard:variant_stock' f.instance.pk %}">{{ f.instance.inventory.quantity }}</a></td>
+        <td>{{ f.price_override }}{% for e in f.price_override.errors %}<p class="field__error">{{ e }}</p>{% endfor %}</td>
+        <td><label class="switch">{{ f.is_active }}<span class="sr-only">Active</span></label></td></tr>
+      {% endfor %}
+    </tbody></table></div>
+    <p class="muted" style="margin-top:12px">Change stock levels from the Stock link so every movement is recorded. Variants are switched off rather than deleted so order history stays intact.</p>
+    <button class="btn btn--secondary" type="submit" style="margin-top:12px">Save variants</button>
+  </form>
+  {% else %}<p class="muted">No variants yet. Customers can't buy a product until it has at least one size and colour.</p>{% endif %}
+
+  <form method="post" action="{% url 'dashboard:variants_create' product.pk %}" style="margin-top:28px;padding-top:20px;border-top:1px solid var(--d-border)" data-loading-form>{% csrf_token %}
+    <h3 class="d-card__title">Add variants</h3><p class="muted">Pick sizes and colours; every missing combination is created.</p>
+    {% include "dashboard/_form_errors.html" with form=variant_form %}
+    {% include "dashboard/_field.html" with field=variant_form.sizes %}{% include "dashboard/_field.html" with field=variant_form.colours %}
+    <div class="form-row">{% include "dashboard/_field.html" with field=variant_form.price_override %}{% include "dashboard/_field.html" with field=variant_form.initial_stock %}</div>
+    <button class="btn" type="submit">Add variants</button>
+    <p class="muted" style="margin-top:8px">Missing a size or colour? <a class="d-link" href="{% url 'dashboard:attributes' %}">Manage attributes</a>.</p>
+  </form>
+</div></section>
+
+<section class="d-card" style="margin-top:20px"><div class="d-card__body" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center">
+  <div><strong>Delete this product</strong><p class="muted" style="margin:4px 0 0">Past orders keep their own copy of what was bought. To just hide it, set it to Draft instead.</p></div>
+  <form method="post" action="{% url 'dashboard:product_delete' product.pk %}" data-confirm="Delete {{ product.name }} permanently?">{% csrf_token %}<button class="btn btn--danger" type="submit">Delete product</button></form>
+</div></section>
+{% endif %}
+{% endblock %}

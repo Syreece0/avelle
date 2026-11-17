@@ -1,0 +1,23 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Stock: {{ variant.product.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><p><a class="d-link" href="{% url 'dashboard:inventory' %}">&larr; Inventory</a></p><h1>{{ variant.product.name }}</h1><p>{{ variant.size.name }} · {{ variant.colour.name }} · {{ variant.sku }}</p></div>
+  <div class="stat" style="text-align:right"><div class="stat__label" style="justify-content:flex-end">In stock</div><div class="stat__value">{{ inv.quantity }}</div></div></div>
+<div class="d-grid d-grid--2-1">
+  <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">History</h2></div>
+    {% if page_obj %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>When</th><th>Reason</th><th class="num">Change</th><th class="num">After</th><th>Note</th></tr></thead><tbody>
+      {% for a in page_obj %}<tr><td>{{ a.created_at|date:"j M Y, H:i" }}</td><td>{{ a.get_reason_display }}{% if a.order_number %}<div class="cell-product__sub">{{ a.order_number }}</div>{% endif %}</td><td class="num">{% if a.change > 0 %}+{% endif %}{{ a.change }}</td><td class="num">{{ a.quantity_after }}</td><td>{{ a.note|default:"-" }}{% if a.created_by %}<div class="cell-product__sub">{{ a.created_by.full_name }}</div>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>{% include "dashboard/_pagination.html" %}
+    {% else %}<div class="d-card__body"><p class="muted">No stock movements yet.</p></div>{% endif %}
+  </section>
+  <div class="stack">
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Adjust stock</h2></div><div class="d-card__body">
+      <form method="post" data-loading-form>{% csrf_token %}<input type="hidden" name="form" value="adjust">
+        {% include "dashboard/_form_errors.html" with form=adjust_form %}
+        {% include "dashboard/_field.html" with field=adjust_form.reason %}{% include "dashboard/_field.html" with field=adjust_form.quantity %}{% include "dashboard/_field.html" with field=adjust_form.note %}
+        <button class="btn" type="submit">Update stock</button></form></div></section>
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Low-stock alert</h2></div><div class="d-card__body">
+      <form method="post">{% csrf_token %}<input type="hidden" name="form" value="threshold">{% include "dashboard/_field.html" with field=threshold_form.low_stock_threshold %}<button class="btn btn--secondary" type="submit">Save</button></form></div></section>
+  </div>
+</div>
+{% endblock %}

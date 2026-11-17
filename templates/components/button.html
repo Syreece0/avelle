@@ -1,0 +1,7 @@
+{% comment %}
+Button component.
+  {% include "components/button.html" with label="Shop women" href="/shop/?category=women" variant="primary" size="lg" icon="arrow-right" %}
+  {% include "components/button.html" with label="Add to bag" type="submit" block=True %}
+Params: label (required), href (renders a link when set), variant (primary|secondary|accent|light|outline-light|ghost|danger),
+        size (sm|lg, default medium), icon (sprite name, shown after label), block, type, extra_class.
+{% endcomment %}{% load avelle_ui %}{% if href %}<a class="btn btn--{{ variant|default:'primary' }}{% if size %} btn--{{ size }}{% endif %}{% if block %} btn--block{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" href="{{ href }}">{{ label }}{% if icon %}{% icon icon "icon--sm" %}{% endif %}</a>{% else %}<button class="btn btn--{{ variant|default:'primary' }}{% if size %} btn--{{ size }}{% endif %}{% if block %} btn--block{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" type="{{ type|default:'button' }}">{{ label }}{% if icon %}{% icon icon "icon--sm" %}{% endif %}</button>{% endif %}

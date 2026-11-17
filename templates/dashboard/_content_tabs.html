@@ -1,0 +1,1 @@
+<div class="d-tabs" aria-label="Website content">{% for url_name, label, key in tabs %}<a class="d-tab" href="{% url url_name %}"{% if key == tab %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}</div>

@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Attributes{% endblock %}
+{% block content %}
+{% include "dashboard/_page_head.html" with title="Brands, sizes and colours" subtitle="The building blocks used when you set up products." %}
+<div class="d-grid d-grid--2">
+  <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Brands</h2><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:attribute_new' 'brand' %}">Add</a></div>
+    <div class="d-card__body">{% if brands %}<ul class="plain-list">{% for b in brands %}<li><a class="d-link" href="{% url 'dashboard:attribute_edit' 'brand' b.pk %}">{{ b.name }}</a><span class="muted">{{ b.n }} product{{ b.n|pluralize }}{% if not b.is_active %} · hidden{% endif %}</span></li>{% endfor %}</ul>{% else %}<p class="muted">No brands yet.</p>{% endif %}</div></section>
+  <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Colours</h2><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:attribute_new' 'colour' %}">Add</a></div>
+    <div class="d-card__body">{% if colours %}<ul class="plain-list">{% for c in colours %}<li><a class="d-link" href="{% url 'dashboard:attribute_edit' 'colour' c.pk %}"><span class="swatch" style="background:{{ c.hex_code }}"></span> {{ c.name }}</a><span class="muted">{{ c.n }} variant{{ c.n|pluralize }}</span></li>{% endfor %}</ul>{% else %}<p class="muted">No colours yet.</p>{% endif %}</div></section>
+</div>
+<section class="d-card" style="margin-top:16px"><div class="d-card__head"><h2 class="d-card__title">Sizes</h2><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:attribute_new' 'size' %}">Add</a></div>
+  <div class="d-card__body">{% if sizes %}<ul class="chip-list">{% for s in sizes %}<li><a class="chip-link" href="{% url 'dashboard:attribute_edit' 'size' s.pk %}">{{ s.name }} <span class="muted">{{ s.get_group_display }}</span></a></li>{% endfor %}</ul>{% else %}<p class="muted">No sizes yet.</p>{% endif %}</div></section>
+{% endblock %}

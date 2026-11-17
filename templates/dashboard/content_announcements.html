@@ -1,0 +1,10 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Announcements{% endblock %}
+{% block content %}
+{% url 'dashboard:content_announcement_new' as new_url %}{% include "dashboard/_page_head.html" with title="Website content" subtitle="A short message in the bar above the site header, such as free delivery or a sale." action_url=new_url action_label="New announcement" %}
+{% include "dashboard/_content_tabs.html" %}
+<section class="d-card">{% if items %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Message</th><th>Order</th><th>Status</th><th class="actions"></th></tr></thead><tbody>
+  {% for a in items %}<tr><td>{{ a.title }}</td><td>{{ a.position }}</td><td>{% if a.is_published %}<span class="d-badge d-badge--paid">Published</span>{% else %}<span class="d-badge d-badge--cancelled">Hidden</span>{% endif %}</td>
+    <td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:content_announcement_edit' a.pk %}">Edit</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="d-empty">{% icon "bell" %}<h3>No announcements</h3><p>The bar above the header stays hidden until one is published.</p></div>{% endif %}</section>
+{% endblock %}

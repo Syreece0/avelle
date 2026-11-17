@@ -1,0 +1,14 @@
+{% load avelle_ui %}
+<ul class="mini-lines">
+  {% for item in order.items.all %}
+    <li><span class="mini-lines__img">{% if item.image_url %}<img src="{{ item.image_url }}" alt="" width="56" height="70">{% endif %}<span class="mini-lines__qty">{{ item.quantity }}</span></span>
+      <span class="mini-lines__name">{{ item.product_name }}<small>{{ item.colour_name }} · {{ item.size_name }}</small></span>
+      <span class="price">{{ item.line_total|naira }}</span></li>
+  {% endfor %}
+</ul>
+<dl class="order-totals">
+  <div><dt>Subtotal</dt><dd class="price">{{ order.subtotal|naira }}</dd></div>
+  {% if order.discount_amount %}<div><dt>Discount{% if order.discount_code_text %} ({{ order.discount_code_text }}){% endif %}</dt><dd class="price">−{{ order.discount_amount|naira }}</dd></div>{% endif %}
+  <div><dt>Delivery ({{ order.delivery_zone_name }})</dt><dd class="price">{% if order.delivery_charge %}{{ order.delivery_charge|naira }}{% else %}Free{% endif %}</dd></div>
+  <div class="cart-summary__total"><dt>Total</dt><dd class="price">{{ order.total|naira }}</dd></div>
+</dl>

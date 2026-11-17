@@ -1,0 +1,24 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Reports</h1><p>{{ data.note }}</p></div>
+  <div class="page-head__actions"><a class="btn btn--secondary" href="?{% if export_qs %}{{ export_qs }}&amp;{% endif %}export=csv">{% icon "download" "icon--sm" %} Download CSV</a></div></div>
+<div class="d-tabs" aria-label="Report">{% for key, label in tabs %}<a class="d-tab" href="?report={{ key }}&amp;from={{ start|date:'Y-m-d' }}&amp;to={{ end|date:'Y-m-d' }}"{% if key == kind %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}</div>
+{% if data.uses_range %}
+<form class="d-card report-range" method="get"><input type="hidden" name="report" value="{{ kind }}">
+  <div class="field"><label class="field__label" for="rf">From</label><input class="input" id="rf" type="date" name="from" value="{{ start|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}"></div>
+  <div class="field"><label class="field__label" for="rt">To</label><input class="input" id="rt" type="date" name="to" value="{{ end|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}"></div>
+  <button class="btn" type="submit">Show</button>
+  <span class="report-range__presets">{% for label, since in presets %}<a class="d-link" href="?report={{ kind }}&amp;from={{ since }}&amp;to={{ today|date:'Y-m-d' }}">{{ label }}</a>{% endfor %}</span>
+</form>
+{% if range_note %}<div class="d-alert" style="margin:12px 0"><div>{{ range_note }}</div></div>{% endif %}
+{% endif %}
+<div class="stat-grid" style="margin-top:16px">{% for label, value, money in data.summary %}<div class="d-card stat"><div class="stat__label">{{ label }}</div><div class="stat__value stat__value--sm">{% if money %}{{ value|naira }}{% else %}{{ value }}{% endif %}</div></div>{% endfor %}</div>
+<section class="d-card">
+  {% if data.rows %}<div class="d-table-wrap"><table class="d-table d-table--report"><thead><tr>{% for c in data.columns %}<th>{{ c }}</th>{% endfor %}</tr></thead><tbody>
+    {% for row in data.rows %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% endfor %}
+  </tbody></table></div>
+  <div class="d-pagination"><span>{% if truncated %}Showing the first {{ data.rows|length }} of {{ total_rows }} rows. Download the CSV for all of them.{% else %}{{ total_rows }} row{{ total_rows|pluralize }}.{% endif %}</span></div>
+  {% else %}<div class="d-empty">{% icon "chart" %}<h3>Nothing to report</h3><p>No paid orders in this period. Try a wider date range.</p></div>{% endif %}
+</section>
+{% endblock %}

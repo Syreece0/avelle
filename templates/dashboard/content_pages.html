@@ -1,0 +1,11 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Pages{% endblock %}
+{% block content %}
+{% url 'dashboard:content_page_new' as new_url %}{% include "dashboard/_page_head.html" with title="Website content" subtitle="About, delivery, returns, privacy and any other information pages." action_url=new_url action_label="New page" %}
+{% include "dashboard/_content_tabs.html" %}
+<section class="d-card">{% if items %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Page</th><th>Address</th><th>Status</th><th class="actions"></th></tr></thead><tbody>
+  {% for p in items %}<tr><td><strong>{{ p.title }}</strong>{% if not p.body %}<div class="cell-product__sub">No text yet</div>{% endif %}</td><td>/pages/{{ p.key }}/</td>
+    <td>{% if p.is_published %}<span class="d-badge d-badge--paid">Published</span>{% else %}<span class="d-badge d-badge--cancelled">Hidden</span>{% endif %}</td>
+    <td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:content_page_edit' p.pk %}">Edit</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="d-empty">{% icon "file" %}<h3>No pages yet</h3><p>Add pages such as About, Shipping and Returns. They're linked from the site footer.</p></div>{% endif %}</section>
+{% endblock %}

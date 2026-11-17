@@ -1,0 +1,74 @@
+{% load avelle_ui %}  {% if f.q %}<input type="hidden" name="q" value="{{ f.q }}">{% endif %}
+  {% if f.category %}<input type="hidden" name="category" value="{{ f.category }}">{% endif %}
+  {% if f.type and f.category %}<input type="hidden" name="type" value="{{ f.type }}">{% endif %}
+  <input type="hidden" name="sort" value="{{ f.sort }}" data-sort-field>
+
+  {% if result.facets.sizes %}
+  <details class="filter" open>
+    <summary>Size {% icon "chevron-down" "icon--sm" %}</summary>
+    {% for group in result.facets.sizes %}
+      <fieldset class="filter__group">
+        {% if result.facets.sizes|length > 1 %}<legend>{{ group.label }}</legend>{% else %}<legend class="sr-only">Size</legend>{% endif %}
+        <div class="option-group">
+          {% for o in group.options %}
+            <label class="option{% if not o.count and not o.selected %} is-zero{% endif %}">
+              <input type="checkbox" name="size" value="{{ o.value }}"{% if o.selected %} checked{% endif %}>
+              <span class="option__label">{{ o.label }}</span>
+              <span class="sr-only">(<span data-count-for="size:{{ o.value }}">{{ o.count }}</span> pieces)</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+    {% endfor %}
+  </details>
+  {% endif %}
+
+  {% if result.facets.colours %}
+  <details class="filter" open>
+    <summary>Colour {% icon "chevron-down" "icon--sm" %}</summary>
+    <fieldset class="filter__group">
+      <legend class="sr-only">Colour</legend>
+      <div class="option-group">
+        {% for o in result.facets.colours %}
+          <label class="option{% if not o.count and not o.selected %} is-zero{% endif %}" title="{{ o.label }}">
+            <input type="checkbox" name="colour" value="{{ o.value }}"{% if o.selected %} checked{% endif %}>
+            <span class="option__label swatch" style="--swatch: {{ o.hex }}"></span>
+            <span class="sr-only">{{ o.label }} (<span data-count-for="colour:{{ o.value }}">{{ o.count }}</span> pieces)</span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+  </details>
+  {% endif %}
+
+  {% if result.facets.brands %}
+  <details class="filter">
+    <summary>Brand {% icon "chevron-down" "icon--sm" %}</summary>
+    <fieldset class="filter__group">
+      <legend class="sr-only">Brand</legend>
+      {% for o in result.facets.brands %}
+        <label class="check"><input type="checkbox" name="brand" value="{{ o.value }}"{% if o.selected %} checked{% endif %}><span>{{ o.label }} <span class="filter__n">(<span data-count-for="brand:{{ o.value }}">{{ o.count }}</span>)</span></span></label>
+      {% endfor %}
+    </fieldset>
+  </details>
+  {% endif %}
+
+  <details class="filter"{% if f.price_min is not None or f.price_max is not None %} open{% endif %}>
+    <summary>Price {% icon "chevron-down" "icon--sm" %}</summary>
+    <div class="filter__price">
+      <label class="field"><span class="field__label">From ({{ currency_symbol }})</span>
+        <input class="input" type="number" inputmode="numeric" min="0" step="500" name="min" value="{% if f.price_min is not None %}{{ f.price_min|floatformat:"0" }}{% endif %}" placeholder="{{ result.facets.price.low }}"></label>
+      <label class="field"><span class="field__label">To ({{ currency_symbol }})</span>
+        <input class="input" type="number" inputmode="numeric" min="0" step="500" name="max" value="{% if f.price_max is not None %}{{ f.price_max|floatformat:"0" }}{% endif %}" placeholder="{{ result.facets.price.high }}"></label>
+    </div>
+  </details>
+
+  <details class="filter" open>
+    <summary>Show only {% icon "chevron-down" "icon--sm" %}</summary>
+    <label class="check"><input type="checkbox" name="in_stock" value="1"{% if f.in_stock %} checked{% endif %}><span>In stock</span></label>
+    <label class="check"><input type="checkbox" name="new" value="1"{% if f.new %} checked{% endif %}><span>New arrivals</span></label>
+    <label class="check"><input type="checkbox" name="sale" value="1"{% if f.sale %} checked{% endif %}><span>On sale</span></label>
+    <label class="check"><input type="checkbox" name="featured" value="1"{% if f.featured %} checked{% endif %}><span>Featured</span></label>
+  </details>
+
+  <div class="filters__actions"><button class="btn" type="submit">Apply filters</button></div>

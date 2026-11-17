@@ -1,0 +1,11 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><p><a class="d-link" href="{% url back.0 %}">&larr; {{ back.1 }}</a></p><h1>{{ title }}</h1></div></div>
+<form method="post" class="d-card" {% if multipart %}enctype="multipart/form-data"{% endif %} data-loading-form style="max-width:760px"><div class="d-card__body">{% csrf_token %}
+  {% include "dashboard/_form_errors.html" %}
+  {% for field in form %}{% include "dashboard/_field.html" %}{% endfor %}
+  <div class="sticky-actions"><a class="btn btn--secondary" href="{% url back.0 %}">Cancel</a><button class="btn" type="submit">Save</button></div>
+</div></form>
+{% if delete_url %}<form method="post" action="{{ delete_url }}" data-confirm="{{ delete_message }}" style="margin-top:16px">{% csrf_token %}<button class="btn btn--danger btn--sm" type="submit">Delete</button></form>{% endif %}
+{% endblock %}

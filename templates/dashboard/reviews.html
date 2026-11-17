@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Reviews{% endblock %}
+{% block content %}
+{% include "dashboard/_page_head.html" with title="Reviews" subtitle="Only approved reviews appear on product pages." %}
+<div class="d-tabs"><a class="d-tab" href="?"{% if state == "pending" %} aria-current="page"{% endif %}>Awaiting approval</a><a class="d-tab" href="?state=approved"{% if state == "approved" %} aria-current="page"{% endif %}>Published</a><a class="d-tab" href="?state=all"{% if state == "all" %} aria-current="page"{% endif %}>All</a></div>
+<section class="d-card">
+  {% if page_obj %}<ul class="review-list">
+    {% for r in page_obj %}<li><div><strong>{{ r.rating }}/5</strong>{% if r.title %} · {{ r.title }}{% endif %} {% if r.is_verified_purchase %}<span class="d-badge d-badge--paid">Verified purchase</span>{% endif %}{% if not r.is_approved %} <span class="d-badge d-badge--pending">Awaiting approval</span>{% endif %}
+      <p>{{ r.body|default:"(No written review)" }}</p><div class="cell-product__sub">{{ r.user.full_name }} on <a class="d-link" href="{% url 'dashboard:product_edit' r.product_id %}">{{ r.product.name }}</a> · {{ r.created_at|date:"j M Y" }}</div></div>
+      <div class="review-list__actions">
+        <form method="post" action="{% url 'dashboard:review_action' r.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="action" value="{% if r.is_approved %}unapprove{% else %}approve{% endif %}"><button class="btn btn--secondary btn--sm" type="submit">{% if r.is_approved %}Hide{% else %}Approve{% endif %}</button></form>
+        <form method="post" action="{% url 'dashboard:review_action' r.pk %}" data-confirm="Delete this review permanently?">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="action" value="delete"><button class="btn btn--ghost btn--sm" type="submit">Delete</button></form></div></li>{% endfor %}
+  </ul>{% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "star" %}<h3>No reviews here</h3><p>{% if state == "pending" %}Nothing is waiting for approval.{% else %}Reviews will appear when customers write them.{% endif %}</p></div>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,175 @@
+/* ==========================================================================
+   AVELLE "light glass" theme. Loads LAST on the storefront and the dashboard.
+   Same ivory / champagne / ink / gold palette, restyled as frosted glass:
+   translucent panels, soft light edges, a faint glow behind everything, glossy buttons.
+
+   Performance rule: real backdrop blur (expensive) only on a few large surfaces
+   (header, menus, dialogs, drawers, dashboard shell and cards). The many product cards
+   use translucent fill + light edges only; blur would show nothing behind them anyway.
+
+   Fallbacks: no backdrop-filter support, prefers-reduced-transparency and
+   prefers-contrast: more all switch glass surfaces to solid colours.
+   ========================================================================== */
+:root {
+  --glass-fill: rgba(255, 255, 255, 0.58);
+  --glass-fill-strong: rgba(255, 255, 255, 0.78);
+  --glass-fill-soft: rgba(255, 255, 255, 0.38);
+  --glass-edge: rgba(255, 255, 255, 0.85);          /* bright rim */
+  --glass-line: rgba(23, 23, 23, 0.09);             /* faint outer line so panels read on ivory */
+  --glass-blur: 18px;
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 10px 30px -14px rgba(60, 48, 28, 0.28);
+  --glass-shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.95) inset, 0 22px 48px -18px rgba(60, 48, 28, 0.38);
+  --glass-solid: #FBF9F5;                           /* what glass becomes when transparency is off */
+  --glow-gold: 182, 154, 104;
+
+  --radius-card: 20px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+  --d-radius: 18px;
+}
+
+/* ---------------------------------------------------------------- ambient backdrop */
+body { background: var(--ivory); position: relative; }
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(34vmax 30vmax at 6% 4%, rgba(var(--glow-gold), 0.26), transparent 70%),
+    radial-gradient(30vmax 28vmax at 96% 10%, rgba(190, 206, 226, 0.62), transparent 70%),
+    radial-gradient(28vmax 26vmax at 82% 78%, rgba(236, 208, 203, 0.50), transparent 70%),
+    radial-gradient(34vmax 30vmax at 12% 92%, rgba(var(--glow-gold), 0.20), transparent 70%),
+    linear-gradient(180deg, #F8F6F1 0%, #F2EDE3 100%);
+}
+body.dash { background: transparent; }
+
+/* ---------------------------------------------------------------- shared glass surface */
+.site-header {
+  background: rgba(250, 248, 243, 0.62);
+  -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur)); backdrop-filter: saturate(160%) blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-edge);
+  box-shadow: 0 1px 0 var(--glass-line), 0 10px 30px -22px rgba(60, 48, 28, 0.5);
+}
+.mega, .search-panel {
+  background: var(--glass-fill-strong);
+  -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur)); backdrop-filter: saturate(160%) blur(var(--glass-blur));
+  border-color: var(--glass-edge); box-shadow: var(--glass-shadow-lift);
+}
+.modal, .drawer {
+  background: var(--glass-fill-strong);
+  -webkit-backdrop-filter: saturate(160%) blur(calc(var(--glass-blur) + 6px)); backdrop-filter: saturate(160%) blur(calc(var(--glass-blur) + 6px));
+  border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow-lift);
+}
+.modal__foot, .drawer__foot { background: rgba(255, 255, 255, 0.45); border-color: var(--glass-line); }
+dialog::backdrop { background: rgba(40, 34, 24, 0.28); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.dropdown__panel, .search-suggest {
+  background: var(--glass-fill-strong); border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow-lift);
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Cards: glass without backdrop blur (there are many of them) */
+.pc__tilt, .acard, .cart-summary, .order__notice, .pdp__soldout {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.5));
+  border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow);
+}
+.pc__tilt { box-shadow: var(--glass-shadow), var(--shadow-float); }
+@media (hover: hover) and (pointer: fine) {
+  .pc__tilt:hover, .pc__tilt:focus-within { box-shadow: var(--glass-shadow-lift), 0 0 0 1px rgba(var(--glow-gold), 0.45), 0 18px 60px -24px rgba(var(--glow-gold), 0.65); }
+}
+.pc__media, .pc__tilt > .pc__media { border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0 0; }
+.collection__media, .promo, .editorial__img, .pdp__stage { border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow); }
+
+/* ---------------------------------------------------------------- controls */
+.btn {
+  border-radius: 999px; overflow: hidden;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 52%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.28) inset, 0 8px 18px -10px rgba(23, 23, 23, 0.55);
+}
+.btn:hover { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.34) inset, 0 12px 26px -10px rgba(23, 23, 23, 0.6), 0 0 0 4px rgba(var(--glow-gold), 0.18); }
+.btn--secondary, .btn--ghost, .btn--outline-light {
+  background-image: none; box-shadow: none;
+}
+.btn--secondary {
+  --btn-bg: var(--glass-fill); --btn-border: rgba(23, 23, 23, 0.55);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.btn--light { background-image: linear-gradient(180deg, #fff, rgba(255, 255, 255, 0.6)); }
+
+.input, .select, .textarea, .qty, .option__label, .shop-type, .search-field .input {
+  background-color: var(--glass-fill); border: 1px solid rgba(23, 23, 23, 0.16);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 1px 2px rgba(60, 48, 28, 0.06);
+}
+/* No backdrop blur on the small chips: it would paint over the invisible checkbox that sits behind each label. */
+.input, .select, .textarea { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.input, .select, .textarea { border-radius: 12px; }
+.input:focus, .select:focus, .textarea:focus {
+  outline: none; border-color: var(--ink); background-color: var(--glass-fill-strong);
+  box-shadow: 0 0 0 4px rgba(var(--glow-gold), 0.28), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+.option__label, .shop-type { border-radius: 999px; }
+.option input:checked + .option__label, .shop-type.is-active { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0)); }
+.pdp__nav, .lightbox__nav {
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.pc__wish, .pdp__nav { background: rgba(255, 255, 255, 0.72); border: 1px solid var(--glass-edge); }
+.toast {
+  background: rgba(23, 23, 23, 0.82); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 16px;
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Footer and hero keep their dark photographic look, with a glass top edge */
+.site-footer { background: linear-gradient(180deg, #1d1c1a 0%, #131312 100%); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset; }
+.hero__veil { background: linear-gradient(180deg, rgba(23, 23, 23, 0.28), rgba(23, 23, 23, 0.42)); }
+
+/* ---------------------------------------------------------------- dashboard */
+.dash-sidebar {
+  background: linear-gradient(180deg, rgba(30, 28, 25, 0.9), rgba(18, 17, 16, 0.94));
+  -webkit-backdrop-filter: blur(22px) saturate(140%); backdrop-filter: blur(22px) saturate(140%);
+  border-right: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 18px 0 50px -30px rgba(23, 23, 23, 0.6);
+}
+.dash-nav__link[aria-current="page"] {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.14) inset, 0 0 0 1px rgba(var(--glow-gold), 0.35), 0 0 22px -6px rgba(var(--glow-gold), 0.55);
+}
+.dash-topbar {
+  background: rgba(250, 248, 243, 0.62); border-bottom: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur)); backdrop-filter: saturate(160%) blur(var(--glass-blur));
+}
+.d-card {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.46));
+  border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
+}
+.d-table tbody tr:hover { background: rgba(255, 255, 255, 0.55); }
+.d-table th { background: transparent; }
+.d-alert { border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: var(--glass-shadow); }
+.d-tab[aria-current="page"], .d-tab[aria-selected="true"] { border-color: rgba(var(--glow-gold), 1); }
+.d-card .sticky-actions { background: rgba(255, 255, 255, 0.5); }
+
+/* Smaller blur on phones: cheaper to paint, and the panels are smaller anyway */
+@media (max-width: 899px) { :root { --glass-blur: 12px; } }
+
+/* A slow sheen over glass cards on hover, for pointer devices that don't mind motion */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .acard, .cart-summary { position: relative; overflow: clip; }
+  .acard::after, .cart-summary::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+    transform: translateX(-60%); transition: transform 900ms var(--ease-out), opacity 300ms;
+  }
+  .acard:hover::after, .cart-summary:hover::after { opacity: 1; transform: translateX(60%); }
+}
+
+/* ---------------------------------------------------------------- fallbacks: solid surfaces */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header, .mega, .search-panel, .modal, .drawer, .dropdown__panel, .search-suggest, .dash-topbar, .d-card,
+  .input, .select, .textarea, .qty, .option__label, .shop-type { background-color: var(--glass-solid); background-image: none; }
+  .dash-sidebar, .toast { background: #1b1a18; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .site-header, .mega, .search-panel, .modal, .drawer, .dropdown__panel, .search-suggest, .dash-topbar, .d-card,
+  .pc__tilt, .acard, .cart-summary, .input, .select, .textarea, .qty, .option__label, .shop-type, .btn--secondary {
+    background-color: var(--glass-solid); background-image: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  .dash-sidebar, .toast { background: #1b1a18; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  body::before { background: var(--ivory); }
+}

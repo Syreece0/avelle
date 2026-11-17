@@ -1,0 +1,25 @@
+{% extends "accounts/base_account.html" %}
+{% load avelle_ui %}
+{% block title %}Notifications · AVELLE{% endblock %}
+{% block heading %}Notifications{% endblock %}
+{% block account_content %}
+{% if items %}
+  <ul class="addr-list">
+    {% for n in items %}
+      <li class="acard">
+        <h2>{{ n.title }}{% if n.pk in unread_ids %} <span class="badge badge--ink">New</span>{% endif %}</h2>
+        <p>{{ n.message }}</p>
+        <p class="muted"><time datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|date:"j M Y, H:i" }}</time>{% if n.safe_link %} · <a href="{{ n.safe_link }}">View</a>{% endif %}</p>
+      </li>
+    {% endfor %}
+  </ul>
+  {% if page.has_other_pages %}
+  <nav aria-label="Pages" class="acard__actions">
+    {% if page.has_previous %}<a class="btn btn--secondary btn--sm" href="?page={{ page.previous_page_number }}">Newer</a>{% endif %}
+    {% if page.has_next %}<a class="btn btn--secondary btn--sm" href="?page={{ page.next_page_number }}">Older</a>{% endif %}
+  </nav>
+  {% endif %}
+{% else %}
+  <p class="muted">Nothing here yet. Updates about your orders will appear on this page and be emailed to you.</p>
+{% endif %}
+{% endblock %}

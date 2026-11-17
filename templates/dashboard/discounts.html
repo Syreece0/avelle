@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Discount codes{% endblock %}
+{% block content %}
+{% url 'dashboard:discount_new' as new_url %}{% include "dashboard/_page_head.html" with title="Discount codes" subtitle="Codes customers type at checkout." action_url=new_url action_label="New code" %}
+<section class="d-card">
+  <form class="d-toolbar" method="get" role="search"><div class="search-field">{% icon "search" %}<label class="sr-only" for="dq">Search</label><input id="dq" class="input" type="search" name="q" value="{{ q }}" placeholder="Code" maxlength="60"></div><button class="btn btn--secondary btn--sm" type="submit">Search</button></form>
+  {% if page_obj %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Code</th><th>Discount</th><th>Minimum</th><th>Used</th><th>Valid</th><th>State</th></tr></thead><tbody>
+    {% for c in page_obj %}<tr><td><a class="d-link" href="{% url 'dashboard:discount_edit' c.pk %}">{{ c.code }}</a>{% if c.description %}<div class="cell-product__sub">{{ c.description }}</div>{% endif %}</td>
+      <td>{% if c.kind == "percentage" %}{{ c.percent_off }}% off{% else %}{{ c.amount_off|naira }} off{% endif %}</td><td>{% if c.minimum_subtotal %}{{ c.minimum_subtotal|naira }}{% else %}None{% endif %}</td>
+      <td>{{ c.times_used }}{% if c.usage_limit %} / {{ c.usage_limit }}{% endif %}</td>
+      <td>{% if c.starts_at %}{{ c.starts_at|date:"j M" }}{% else %}Now{% endif %} to {% if c.expires_at %}{{ c.expires_at|date:"j M Y" }}{% else %}no end{% endif %}</td>
+      <td><span class="d-badge d-badge--{% if c.state == 'live' %}paid{% elif c.state == 'scheduled' %}processing{% elif c.state == 'inactive' %}cancelled{% else %}pending{% endif %}">{{ c.state|capfirst }}</span></td></tr>{% endfor %}
+  </tbody></table></div>{% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "percent" %}<h3>No discount codes</h3><p>Create a code such as WELCOME10 to reward first orders.</p></div>{% endif %}
+</section>
+{% endblock %}

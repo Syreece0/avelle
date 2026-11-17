@@ -1,0 +1,16 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}My details · AVELLE{% endblock %}
+{% block heading %}My details{% endblock %}
+{% block account_content %}
+<form method="post" class="auth__form" novalidate data-loading-form>
+  {% csrf_token %}
+  <div class="auth__row">
+    {% include "components/form_field.html" with field=form.first_name %}
+    {% include "components/form_field.html" with field=form.last_name %}
+  </div>
+  {% include "components/form_field.html" with field=form.email %}
+  {% include "components/form_field.html" with field=form.phone %}
+  <label class="check"><input type="checkbox" name="marketing_opt_in" value="on"{% if form.marketing_opt_in.value %} checked{% endif %}><span>{{ form.marketing_opt_in.label }}</span></label>
+  <button class="btn" type="submit">Save changes</button>
+</form>
+{% endblock %}

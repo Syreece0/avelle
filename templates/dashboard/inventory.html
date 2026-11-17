@@ -1,0 +1,27 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Inventory{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Inventory</h1><p>Stock for every size and colour. Each change is logged.</p></div><div class="page-head__actions"><a class="btn btn--secondary" href="{% url 'dashboard:stock_history' %}">Stock history</a></div></div>
+<div class="stat-grid stat-grid--3">
+  <div class="d-card stat"><div class="stat__label">Variants tracked</div><div class="stat__value">{{ summary.all }}</div></div>
+  <a class="d-card stat" href="?state=low" style="text-decoration:none"><div class="stat__label">Low stock</div><div class="stat__value">{{ summary.low }}</div></a>
+  <a class="d-card stat{% if summary.out %} stat--alert{% endif %}" href="?state=out" style="text-decoration:none"><div class="stat__label">Out of stock</div><div class="stat__value">{{ summary.out }}</div></a>
+</div>
+<section class="d-card">
+  <form class="d-toolbar" method="get" role="search">
+    <div class="search-field">{% icon "search" %}<label class="sr-only" for="iq">Search</label><input id="iq" class="input" type="search" name="q" value="{{ q }}" placeholder="Product name or SKU" maxlength="80"></div>
+    <label class="sr-only" for="is">Stock level</label><select id="is" class="select" name="state" data-autosubmit style="width:auto"><option value="">All levels</option><option value="low"{% if state == "low" %} selected{% endif %}>Low</option><option value="out"{% if state == "out" %} selected{% endif %}>Out of stock</option><option value="in"{% if state == "in" %} selected{% endif %}>Healthy</option></select>
+    <button class="btn btn--secondary btn--sm" type="submit">Filter</button>
+  </form>
+  {% if page_obj %}
+  <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Product</th><th>Size</th><th>Colour</th><th>SKU</th><th>Status</th><th class="num">In stock</th><th class="actions"></th></tr></thead><tbody>
+    {% for inv in page_obj %}
+    <tr><td><a class="d-link" href="{% url 'dashboard:product_edit' inv.variant.product_id %}">{{ inv.variant.product.name }}</a></td><td>{{ inv.variant.size.name }}</td><td>{{ inv.variant.colour.name }}</td><td>{{ inv.variant.sku }}</td>
+      <td>{% if inv.quantity == 0 %}<span class="d-badge d-badge--refunded">Out</span>{% elif inv.is_low_stock %}<span class="d-badge d-badge--low">Low</span>{% else %}<span class="d-badge d-badge--paid">OK</span>{% endif %}{% if not inv.variant.is_active %} <span class="muted">inactive</span>{% endif %}</td>
+      <td class="num">{{ inv.quantity }}</td><td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:variant_stock' inv.variant_id %}">Adjust</a></td></tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "box" %}<h3>No variants found</h3><p>Add sizes and colours to a product to start tracking stock.</p></div>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>AVELLE Dashboard Style Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body class="dash" data-icons="../img/icons.svg">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<aside class="dash-sidebar" aria-label="Dashboard navigation">
+  <div class="dash-brand"><a class="wordmark wordmark--light" href="#" aria-label="AVELLE">AVELLE</a><span class="dash-brand__tag">Admin</span></div>
+  <nav class="dash-nav">
+      <a class="dash-nav__link" href="#" aria-current="page"><svg class="icon"><use href="../img/icons.svg#i-grid"/></svg><span>Overview</span></a>
+      <div class="dash-nav__label">Catalogue</div>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-tag"/></svg><span>Products</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-layers"/></svg><span>Categories</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-box"/></svg><span>Inventory</span><span class="dash-nav__count">3</span></a>
+      <div class="dash-nav__label">Sales</div>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-bag"/></svg><span>Orders</span><span class="dash-nav__count">7</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-users"/></svg><span>Customers</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-card"/></svg><span>Payments</span></a>
+      <div class="dash-nav__label">Marketing</div>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-image"/></svg><span>Promotions</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-percent"/></svg><span>Discounts</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-star"/></svg><span>Reviews</span><span class="dash-nav__count">2</span></a>
+      <div class="dash-nav__label">Site</div>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-bell"/></svg><span>Notifications</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-file"/></svg><span>Website content</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-chart"/></svg><span>Reports and analytics</span></a>
+      <a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-settings"/></svg><span>Settings</span></a>
+  </nav>
+  <div class="dash-sidebar__foot"><a class="dash-nav__link" href="#"><svg class="icon"><use href="../img/icons.svg#i-logout"/></svg><span>Sign out</span></a></div>
+</aside>
+
+<div class="dash-main">
+  <header class="dash-topbar">
+    <button class="icon-btn dash-menu-btn" type="button" data-sidebar-toggle aria-label="Open navigation"><svg class="icon"><use href="../img/icons.svg#i-menu"/></svg></button>
+    <div class="dash-topbar__search search-field"><label class="sr-only" for="ds">Search the dashboard</label><svg class="icon"><use href="../img/icons.svg#i-search"/></svg><input id="ds" class="input" type="search" placeholder="Search orders, products, customers"></div>
+    <div class="dash-topbar__spacer"></div>
+    <a class="icon-btn" href="index.html" aria-label="Storefront style guide"><svg class="icon"><use href="../img/icons.svg#i-home"/></svg></a>
+    <div class="dash-user"><span class="avatar" aria-hidden="true">AO</span><span class="dash-user__name">Admin Owner</span></div>
+  </header>
+
+  <main id="main" class="dash-content" tabindex="-1">
+    <div class="page-head">
+      <div><h1>Overview</h1><p>Style guide with sample figures. Real dashboards read from the database.</p></div>
+      <div class="page-head__actions">
+        <div class="dropdown" data-dropdown><button class="dropdown__trigger" type="button" aria-expanded="false" aria-controls="dd-range">Last 30 days<svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></button>
+          <div class="dropdown__panel dropdown__panel--right" id="dd-range" hidden><button class="dropdown__option" type="button">Today</button><button class="dropdown__option" type="button" aria-checked="true" role="menuitemradio">Last 30 days</button><button class="dropdown__option" type="button">This year</button></div></div>
+        <button class="btn" type="button"><svg class="icon icon--sm"><use href="../img/icons.svg#i-plus"/></svg> Add product</button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="d-card stat"><div class="stat__label"><svg class="icon"><use href="../img/icons.svg#i-card"/></svg>Total revenue</div><div class="stat__value">&#8358;4,826,500</div><div class="stat__meta"><span class="delta delta--up">+12.4%</span> vs previous period</div></div>
+      <div class="d-card stat"><div class="stat__label"><svg class="icon"><use href="../img/icons.svg#i-bag"/></svg>Orders</div><div class="stat__value">186</div><div class="stat__meta"><span class="delta delta--up">+8.1%</span> vs previous period</div></div>
+      <div class="d-card stat"><div class="stat__label"><svg class="icon"><use href="../img/icons.svg#i-users"/></svg>Customers</div><div class="stat__value">412</div><div class="stat__meta"><span class="delta delta--down">-2.3%</span> vs previous period</div></div>
+      <div class="d-card stat stat--alert"><div class="stat__label"><svg class="icon"><use href="../img/icons.svg#i-alert"/></svg>Low-stock products</div><div class="stat__value">9</div><div class="stat__meta"><a class="d-link" href="#">Review inventory</a></div></div>
+    </div>
+
+    <div class="d-grid d-grid--2-1">
+      <section class="d-card" aria-labelledby="rev-title">
+        <div class="d-card__head"><h2 class="d-card__title" id="rev-title">Revenue</h2>
+          <div class="legend"><span class="legend__item"><span class="legend__swatch" style="--c:var(--chart-1)"></span>This period</span><span class="legend__item"><span class="legend__swatch" style="--c:var(--chart-4)"></span>Previous</span></div></div>
+        <div class="d-card__body chart-box">
+          <svg viewBox="0 0 600 240" width="100%" role="img" aria-label="Sample revenue line chart: rising from 40 to 170 over 30 days">
+            <g stroke="var(--chart-grid)" stroke-width="1"><line x1="40" x2="590" y1="30" y2="30"/><line x1="40" x2="590" y1="90" y2="90"/><line x1="40" x2="590" y1="150" y2="150"/><line x1="40" x2="590" y1="210" y2="210"/></g>
+            <g fill="var(--grey-text)" font-size="11" font-family="Inter, sans-serif"><text x="4" y="34">&#8358;5m</text><text x="4" y="94">&#8358;3m</text><text x="4" y="154">&#8358;1m</text><text x="40" y="232">1 Oct</text><text x="300" y="232">15 Oct</text><text x="548" y="232">30 Oct</text></g>
+            <polyline fill="none" stroke="var(--chart-4)" stroke-width="2" stroke-dasharray="5 4" points="40,170 120,160 200,165 280,140 360,150 440,120 520,125 590,105"/>
+            <polyline fill="none" stroke="var(--chart-1)" stroke-width="2.5" stroke-linejoin="round" points="40,180 120,150 200,155 280,110 360,120 440,80 520,70 590,48"/>
+            <circle cx="590" cy="48" r="4" fill="var(--chart-1)"/>
+          </svg>
+        </div>
+      </section>
+      <section class="d-card" aria-labelledby="best-title">
+        <div class="d-card__head"><h2 class="d-card__title" id="best-title">Best-selling products</h2></div>
+        <div class="d-card__body bar-list">
+          <div class="bar-list__row"><div class="bar-list__head"><span>Linen Camp Shirt</span><strong>48</strong></div><div class="bar-list__track"><div class="bar-list__fill" style="--w:100%"></div></div></div>
+          <div class="bar-list__row"><div class="bar-list__head"><span>Silk Slip Dress</span><strong>36</strong></div><div class="bar-list__track"><div class="bar-list__fill" style="--w:75%"></div></div></div>
+          <div class="bar-list__row"><div class="bar-list__head"><span>Pleated Wool Trouser</span><strong>29</strong></div><div class="bar-list__track"><div class="bar-list__fill" style="--w:60%"></div></div></div>
+          <div class="bar-list__row"><div class="bar-list__head"><span>Cotton Ankara Set</span><strong>21</strong></div><div class="bar-list__track"><div class="bar-list__fill" style="--w:44%"></div></div></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="d-card" style="margin-top:16px" aria-labelledby="ord-title">
+      <div class="d-card__head" style="padding-bottom:14px"><h2 class="d-card__title" id="ord-title">Recent orders</h2><a class="d-link" href="#">View all</a></div>
+      <div class="d-toolbar">
+        <div class="search-field"><svg class="icon"><use href="../img/icons.svg#i-search"/></svg><label class="sr-only" for="os">Search orders</label><input id="os" class="input" type="search" placeholder="Search by order number or customer"></div>
+        <div class="dropdown" data-dropdown><button class="dropdown__trigger" type="button" aria-expanded="false" aria-controls="dd-status">Status<svg class="icon"><use href="../img/icons.svg#i-chevron-down"/></svg></button>
+          <div class="dropdown__panel" id="dd-status" hidden><label class="check"><input type="checkbox"><span>Pending payment</span></label><label class="check"><input type="checkbox"><span>Paid</span></label><label class="check"><input type="checkbox"><span>Shipped</span></label></div></div>
+        <span class="d-toolbar__spacer"></span>
+        <button class="btn btn--secondary btn--sm" type="button"><svg class="icon icon--sm"><use href="../img/icons.svg#i-download"/></svg> Export</button>
+      </div>
+      <div class="d-table-wrap"><table class="d-table">
+        <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">State</th><th scope="col" class="num">Total</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody>
+<tr><td><a class="d-link" href="#">AV-7K3Q9XD2</a></td><td>Adaeze Okafor</td><td>Lagos</td><td class="num">₦128,500</td><td><span class="d-badge d-badge--paid">Paid</span></td><td class="actions"><button class="icon-btn" type="button" aria-label="View order AV-7K3Q9XD2"><svg class="icon"><use href="../img/icons.svg#i-eye"/></svg></button></td></tr>
+<tr><td><a class="d-link" href="#">AV-M4T8WNB6</a></td><td>Tunde Bello</td><td>Abuja</td><td class="num">₦54,000</td><td><span class="d-badge d-badge--pending">Pending payment</span></td><td class="actions"><button class="icon-btn" type="button" aria-label="View order AV-M4T8WNB6"><svg class="icon"><use href="../img/icons.svg#i-eye"/></svg></button></td></tr>
+<tr><td><a class="d-link" href="#">AV-H2C6RPE9</a></td><td>Ngozi Eze</td><td>Enugu</td><td class="num">₦212,000</td><td><span class="d-badge d-badge--shipped">Shipped</span></td><td class="actions"><button class="icon-btn" type="button" aria-label="View order AV-H2C6RPE9"><svg class="icon"><use href="../img/icons.svg#i-eye"/></svg></button></td></tr>
+<tr><td><a class="d-link" href="#">AV-Z9L3KQF4</a></td><td>Ibrahim Musa</td><td>Kano</td><td class="num">₦38,500</td><td><span class="d-badge d-badge--processing">Processing</span></td><td class="actions"><button class="icon-btn" type="button" aria-label="View order AV-Z9L3KQF4"><svg class="icon"><use href="../img/icons.svg#i-eye"/></svg></button></td></tr>
+<tr><td><a class="d-link" href="#">AV-P5D7JVA3</a></td><td>Chiamaka Obi</td><td>Rivers</td><td class="num">₦96,000</td><td><span class="d-badge d-badge--delivered">Delivered</span></td><td class="actions"><button class="icon-btn" type="button" aria-label="View order AV-P5D7JVA3"><svg class="icon"><use href="../img/icons.svg#i-eye"/></svg></button></td></tr>
+<tr><td><a class="d-link" href="#">AV-B8N2XTC7</a></td><td>Seyi Adeyemi</td><td>Oyo</td><td class="num">₦72,500</td><td><span class="d-badge d-badge--cancelled">Cancelled</span></td><td class="actions"><button class="icon-btn" type="button" aria-label="View order AV-B8N2XTC7"><svg class="icon"><use href="../img/icons.svg#i-eye"/></svg></button></td></tr>
+        </tbody></table></div>
+      <div class="d-pagination"><span>Showing 1 to 6 of 186</span><div class="d-pagination__pages"><a class="page-btn" href="#" aria-label="Previous page"><svg class="icon icon--sm"><use href="../img/icons.svg#i-chevron-left"/></svg></a><a class="page-btn" href="#" aria-current="page">1</a><a class="page-btn" href="#">2</a><a class="page-btn" href="#">3</a><a class="page-btn" href="#" aria-label="Next page"><svg class="icon icon--sm"><use href="../img/icons.svg#i-chevron-right"/></svg></a></div></div>
+    </section>
+
+    <div class="d-grid d-grid--2" style="margin-top:16px">
+      <section class="d-card" aria-labelledby="form-title">
+        <div class="d-card__head"><h2 class="d-card__title" id="form-title">Product form pattern</h2></div>
+        <form class="d-card__body" onsubmit="return false">
+          <div class="form-section" style="padding-top:0"><div class="form-section__intro"><h2>Product information</h2><p>Name and category.</p></div>
+            <div><div class="field"><label class="field__label" for="pn">Product name <span class="req">*</span></label><input id="pn" class="input" placeholder="Linen Camp Shirt"></div>
+            <div class="field has-error"><label class="field__label" for="pp">Discounted price</label><input id="pp" class="input" value="45000" aria-invalid="true"><p class="field__error" role="alert">The discounted price must be lower than the regular price.</p></div></div></div>
+          <div class="form-section"><div class="form-section__intro"><h2>Media</h2><p>JPG, PNG or WebP up to 5 MB.</p></div>
+            <div><div class="upload-zone"><svg class="icon"><use href="../img/icons.svg#i-image"/></svg><strong>Drop images here</strong><span>or browse your computer</span></div>
+            <div class="thumb-grid"><div class="thumb"><span class="thumb__tag badge badge--ink">Main</span></div><div class="thumb"></div></div></div></div>
+          <div class="form-section"><div class="form-section__intro"><h2>Visibility</h2></div>
+            <div><label class="switch"><input type="checkbox" checked><span>Featured product</span></label><br><label class="switch"><input type="checkbox"><span>New arrival</span></label></div></div>
+          <div class="sticky-actions"><button class="btn btn--secondary" type="button" data-dialog-open="confirm-dialog">Discard</button><button class="btn" type="submit">Save changes</button></div>
+        </form>
+      </section>
+      <div class="stack">
+        <section class="d-card"><div class="d-empty"><svg class="icon"><use href="../img/icons.svg#i-box"/></svg><h3>No low-stock products</h3><p>Every variant is above its stock threshold.</p></div></section>
+        <section class="d-card"><div class="d-card__body"><div class="d-alert"><svg class="icon"><use href="../img/icons.svg#i-alert"/></svg><span>9 variants are at or below their low-stock threshold.</span></div>
+          <div class="d-tabs" style="margin-top:16px" role="tablist"><button class="d-tab" role="tab" aria-selected="true">All</button><button class="d-tab" role="tab" aria-selected="false">Low stock</button><button class="d-tab" role="tab" aria-selected="false">Out of stock</button></div>
+          <div class="cell-product"><div class="cell-product__thumb"><svg class="icon"><use href="../img/icons.svg#i-shirt"/></svg></div><div><div class="cell-product__name">Linen Camp Shirt</div><div class="cell-product__sub">M &middot; Camel &middot; <span class="d-badge d-badge--low">2 left</span></div></div></div>
+          <div class="sg-row" style="display:flex;gap:10px;margin-top:16px"><div class="d-spinner" role="status" aria-label="Loading"></div><div class="d-skeleton" style="width:140px"></div></div></div></section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<dialog id="confirm-dialog" class="modal modal--sm" aria-labelledby="ct">
+  <div class="modal__head"><h2 id="ct" class="modal__title">Discard changes?</h2></div>
+  <div class="modal__body"><p class="muted">Your unsaved edits to this product will be lost.</p></div>
+  <div class="modal__foot"><button class="btn btn--secondary" type="button" data-dialog-close>Keep editing</button><button class="btn btn--danger" type="button" data-dialog-close>Discard</button></div>
+</dialog>
+
+<div id="toast-region" class="toast-region" aria-live="polite"></div>
+<script src="../js/ui.js" defer></script>
+</body>
+</html>

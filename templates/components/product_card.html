@@ -1,0 +1,55 @@
+{% comment %}
+Floating product card. Three nested layers keep entrance, float and tilt animations
+independent (see static/css/product-card.css). The surrounding <li> is the stable grid cell.
+
+  <ul class="product-grid">
+    {% for product in products %}
+      {% include "components/product_card.html" with product=product %}
+    {% endfor %}
+  </ul>
+
+Expects a Product (with images prefetched). Optional: in_wishlist=True, sold_out=True (or annotate product.in_stock as False).
+{% endcomment %}{% load avelle_ui %}
+<li class="product-grid__item">
+  <div class="pc{% if sold_out or product.in_stock is False %} pc--soldout{% endif %}" data-pc>
+    <div class="pc__float" data-pc-float>
+      <article class="pc__tilt" data-pc-tilt>
+        {% with image=product.primary_image %}
+        <a class="pc__media" href="{{ product.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+          {% if image %}
+            <img src="{{ image.image.url|cdn:640 }}" alt="" width="640" height="800" loading="lazy" decoding="async">
+          {% else %}
+            <span class="pc__placeholder">{% icon "shirt" %}</span>
+          {% endif %}
+        </a>
+        {% endwith %}
+
+        <div class="pc__badges">
+          {% if product.is_new_arrival %}<span class="badge badge--ink">New</span>{% endif %}
+          {% if product.has_discount %}<span class="badge badge--gold">-{{ product.discount_percent }}%</span>{% endif %}
+          {% if sold_out or product.in_stock is False %}<span class="badge badge--muted">Sold out</span>{% endif %}
+        </div>
+
+        <button class="pc__wish" type="button" data-wishlist-toggle="{{ product.pk }}" aria-pressed="{% if in_wishlist or product.pk in wishlist_ids %}true{% else %}false{% endif %}" aria-label="Save {{ product.name }} to wishlist">{% icon "heart" %}</button>
+
+        <div class="pc__body">
+          {% if product.brand %}<span class="pc__brand">{{ product.brand.name }}</span>{% endif %}
+          <h3 class="pc__name"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+          <p class="pc__price price">
+            <span class="pc__price-now">{{ product.current_price|naira }}</span>
+            {% if product.has_discount %}<span class="pc__price-was">{{ product.price|naira }}</span>{% endif %}
+          </p>
+        </div>
+
+        <button class="pc__more" type="button" data-pc-more aria-expanded="false" aria-label="Show options for {{ product.name }}">{% icon "plus" %}</button>
+
+        <div class="pc__extra">
+          {% if product.short_description %}<p class="pc__sizes">{{ product.short_description }}</p>{% endif %}
+          <div class="pc__actions">
+            <a class="btn btn--sm" href="{{ product.get_absolute_url }}">{% icon "bag" "icon--sm" %} Choose size</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</li>

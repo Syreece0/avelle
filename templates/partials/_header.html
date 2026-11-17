@@ -1,0 +1,82 @@
+{% load avelle_ui %}
+<header class="site-header">
+  <div class="container">
+    <div class="site-header__bar">
+      <div class="site-header__left">
+        <button class="icon-btn site-header__menu-btn" type="button" data-dialog-open="mobile-nav" aria-label="Open menu">{% icon "menu" %}</button>
+        <nav class="primary-nav" aria-label="Collections">
+          {% for category in nav_categories %}
+            <div class="primary-nav__item">
+              <a class="primary-nav__link" href="/shop/?category={{ category.slug }}">{{ category.name }}</a>
+              {% if category.active_children %}
+                <div class="mega">
+                  <div class="container mega__inner">
+                    <p class="mega__title">{{ category.name }}</p>
+                    <ul class="mega__list">
+                      <li><a href="/shop/?category={{ category.slug }}">View all</a></li>
+                      {% for child in category.active_children %}
+                        <li><a href="/shop/?category={{ category.slug }}&amp;type={{ child.slug }}">{{ child.name }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div class="primary-nav__item"><a class="primary-nav__link" href="/shop/?new=1">New in</a></div>
+        </nav>
+      </div>
+
+      <a class="wordmark" href="/" aria-label="AVELLE, home">AVELLE</a>
+
+      <div class="site-header__right">
+        <button class="icon-btn" type="button" data-toggle="search-panel" aria-expanded="false" aria-controls="search-panel" aria-label="Search">{% icon "search" %}</button>
+        <a class="icon-btn hide-mobile" href="{% if user.is_authenticated %}{% url 'accounts:overview' %}{% else %}{% url 'accounts:login' %}{% endif %}" aria-label="{% if user.is_authenticated %}My account{% else %}Sign in{% endif %}">{% icon "user" %}</a>
+        <a class="icon-btn hide-mobile" href="{% url 'wishlist:wishlist' %}" aria-label="Wishlist">{% icon "heart" %}</a>
+        <a class="icon-btn" href="{% url 'cart:cart' %}" aria-label="Bag{% if cart_count %}, {{ cart_count }} item{{ cart_count|pluralize }}{% endif %}" data-cart-link>
+          {% icon "bag" %}
+          <span class="icon-btn__count" data-cart-count{% if not cart_count %} hidden{% endif %}>{{ cart_count|default:0 }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="search-panel" class="search-panel" hidden>
+    <div class="container">
+      <form class="search-panel__form" action="/shop/" method="get" role="search" data-search-form>
+        <label class="sr-only" for="site-search">Search AVELLE</label>
+        <input id="site-search" class="search-panel__input" type="search" name="q" placeholder="Search products, categories, brands" autocomplete="off" maxlength="80" role="combobox" aria-expanded="false" aria-controls="search-suggest" aria-autocomplete="list">
+        <button class="btn btn--sm" type="submit">Search</button>
+      </form>
+      <div id="search-suggest" class="search-suggest" role="listbox" aria-label="Search suggestions" hidden></div>
+    </div>
+  </div>
+</header>
+
+{# Mobile navigation drawer (native <dialog>: focus trap and Esc handled by the browser) #}
+<dialog id="mobile-nav" class="drawer" aria-label="Menu">
+  <div class="drawer__head">
+    <a class="wordmark" href="/" aria-label="AVELLE, home">AVELLE</a>
+    <button class="icon-btn" type="button" data-dialog-close aria-label="Close menu">{% icon "close" %}</button>
+  </div>
+  <nav class="drawer__nav" aria-label="Mobile">
+    {% for category in nav_categories %}
+      <details>
+        <summary>{{ category.name }} {% icon "chevron-down" %}</summary>
+        <ul>
+          <li><a href="/shop/?category={{ category.slug }}">View all {{ category.name }}</a></li>
+          {% for child in category.active_children %}
+            <li><a href="/shop/?category={{ category.slug }}&amp;type={{ child.slug }}">{{ child.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </details>
+    {% endfor %}
+    <details><summary><a href="/shop/?new=1">New in</a></summary></details>
+    <div class="drawer__links">
+      {% if user.is_authenticated %}<a href="{% url 'accounts:overview' %}">{% icon "user" %} My account</a>{% if user.is_dashboard_user %}<a href="{% url 'dashboard:overview' %}">{% icon "chart" %} Dashboard</a>{% endif %}{% else %}<a href="{% url 'accounts:login' %}">{% icon "user" %} Sign in</a>{% endif %}
+      <a href="{% url 'wishlist:wishlist' %}">{% icon "heart" %} Wishlist</a>
+      {% for page in info_pages %}{% if page.key == "shipping-information" %}<a href="/pages/{{ page.key }}/">{% icon "truck" %} {{ page.title }}</a>{% endif %}{% endfor %}
+      {% if user.is_authenticated %}<form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="drawer__signout" type="submit">{% icon "logout" %} Sign out</button></form>{% endif %}
+    </div>
+  </nav>
+</dialog>

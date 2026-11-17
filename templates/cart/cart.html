@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}Your bag · AVELLE{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/cart.css' %}">{% endblock %}
+{% block content %}
+<section class="section section--tight cart">
+  <div class="container">
+    <h1>Your bag</h1>
+    <div data-cart-body>{% include "cart/_body.html" %}</div>
+  </div>
+</section>
+{% endblock %}

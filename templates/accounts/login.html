@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}Sign in · AVELLE{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/account.css' %}">{% endblock %}
+{% block content %}
+<section class="section auth">
+  <div class="container container--narrow auth__wrap">
+    <span class="eyebrow">Welcome back</span>
+    <h1>Sign in</h1>
+    <form method="post" class="auth__form" novalidate data-loading-form>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="auth__error" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+      {% include "components/form_field.html" with field=form.username %}
+      {% include "components/form_field.html" with field=form.password %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <button class="btn btn--block" type="submit">Sign in</button>
+    </form>
+    <p class="auth__alt"><a href="{% url 'accounts:password_reset' %}">Forgot your password?</a></p>
+    <hr class="rule">
+    <p class="auth__alt">New to AVELLE? <a href="{% url 'accounts:register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Create an account</a></p>
+  </div>
+</section>
+{% endblock %}

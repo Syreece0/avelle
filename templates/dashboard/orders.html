@@ -1,0 +1,27 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+{% include "dashboard/_page_head.html" with title="Orders" subtitle="Everything customers have placed. Paid orders are waiting for you to fulfil them." %}
+<div class="d-tabs" aria-label="Order status">
+  {% for t in tabs %}<a class="d-tab" href="?{% if q %}q={{ q|urlencode }}&amp;{% endif %}{% if t.value %}status={{ t.value }}{% endif %}"{% if t.value == status %} aria-current="page"{% endif %}>{{ t.label }} <span class="muted">{{ t.count }}</span></a>{% endfor %}
+</div>
+<section class="d-card">
+  <form class="d-toolbar" method="get" role="search">
+    {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+    <div class="search-field">{% icon "search" %}<label class="sr-only" for="oq">Search orders</label><input id="oq" class="input" type="search" name="q" value="{{ q }}" placeholder="Order number, name, email or phone" maxlength="80"></div>
+    <button class="btn btn--secondary btn--sm" type="submit">Search</button>
+    {% if q %}<a class="btn btn--ghost btn--sm" href="?{% if status %}status={{ status }}{% endif %}">Clear</a>{% endif %}
+  </form>
+  {% if page_obj %}
+  <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>State</th><th>Items</th><th>Status</th><th class="num">Total</th></tr></thead><tbody>
+    {% for o in page_obj %}
+    <tr><td><a class="d-link" href="{% url 'dashboard:order_detail' o.order_number %}">{{ o.order_number }}</a></td>
+      <td>{{ o.customer_name }}<div class="cell-product__sub">{{ o.email }}</div></td>
+      <td>{{ o.created_at|date:"j M Y, H:i" }}</td><td>{{ o.state }}</td><td>{{ o.item_count }}</td>
+      <td>{% include "dashboard/_status.html" with status=o.status label=o.get_status_display %}</td><td class="num">{{ o.total|naira }}</td></tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "bag" %}<h3>No orders found</h3><p>{% if q or status %}Nothing matches. Try another status or search.{% else %}Orders will show up here once customers check out.{% endif %}</p></div>{% endif %}
+</section>
+{% endblock %}

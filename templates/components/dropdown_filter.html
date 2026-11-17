@@ -1,0 +1,16 @@
+{% comment %}
+Multi-select filter dropdown (shop filters, Phase 5).
+  {% include "components/dropdown_filter.html" with label="Size" name="size" options=size_options selected_count=2 %}
+options: list of dicts {value, label, checked}
+{% endcomment %}{% load avelle_ui %}
+<div class="dropdown" data-dropdown>
+  <button class="dropdown__trigger" type="button" aria-expanded="false" aria-controls="dd-{{ name }}">
+    {{ label }}{% if selected_count %} <span class="dropdown__count">{{ selected_count }}</span>{% endif %}
+    {% icon "chevron-down" %}
+  </button>
+  <div class="dropdown__panel" id="dd-{{ name }}" role="group" aria-label="{{ label }}" hidden>
+    {% for option in options %}
+      <label class="check"><input type="checkbox" name="{{ name }}" value="{{ option.value }}"{% if option.checked %} checked{% endif %}><span>{{ option.label }}</span></label>
+    {% endfor %}
+  </div>
+</div>

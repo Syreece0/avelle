@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Stock history{% endblock %}
+{% block content %}
+<div class="page-head"><div><p><a class="d-link" href="{% url 'dashboard:inventory' %}">&larr; Inventory</a></p><h1>Stock history</h1><p>Every stock movement across all products, newest first.</p></div></div>
+<section class="d-card">
+  <form class="d-toolbar" method="get"><label class="sr-only" for="rs">Reason</label><select id="rs" class="select" name="reason" data-autosubmit style="width:auto"><option value="">All reasons</option>{% for v, l in reasons %}<option value="{{ v }}"{% if v == reason %} selected{% endif %}>{{ l }}</option>{% endfor %}</select><button class="btn btn--secondary btn--sm" type="submit">Filter</button></form>
+  {% if page_obj %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>When</th><th>Product</th><th>Reason</th><th class="num">Change</th><th class="num">After</th><th>By</th></tr></thead><tbody>
+    {% for a in page_obj %}<tr><td>{{ a.created_at|date:"j M Y, H:i" }}</td><td><a class="d-link" href="{% url 'dashboard:variant_stock' a.variant_id %}">{{ a.variant.product.name }}</a><div class="cell-product__sub">{{ a.variant.size.name }} · {{ a.variant.colour.name }}</div></td>
+      <td>{{ a.get_reason_display }}{% if a.order_number %}<div class="cell-product__sub">{{ a.order_number }}</div>{% endif %}</td><td class="num">{% if a.change > 0 %}+{% endif %}{{ a.change }}</td><td class="num">{{ a.quantity_after }}</td><td>{{ a.created_by.full_name|default:"System" }}</td></tr>{% endfor %}
+  </tbody></table></div>{% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "box" %}<h3>No movements yet</h3><p>Sales, restocks and corrections will be listed here.</p></div>{% endif %}
+</section>
+{% endblock %}

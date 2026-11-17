@@ -1,0 +1,18 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Notifications</h1><p>New orders, new customers and stock alerts. Shared by everyone on the team.</p></div>
+  {% if unread_notifications %}<form method="post" action="{% url 'dashboard:notifications_read_all' %}">{% csrf_token %}<button class="btn btn--secondary" type="submit">Mark all as read</button></form>{% endif %}</div>
+<div class="d-tabs"><a class="d-tab" href="?"{% if state == "all" %} aria-current="page"{% endif %}>All</a><a class="d-tab" href="?state=unread"{% if state == "unread" %} aria-current="page"{% endif %}>Unread{% if unread_notifications %} <span class="muted">{{ unread_notifications }}</span>{% endif %}</a></div>
+<section class="d-card">
+  {% if page_obj %}<ul class="review-list">
+    {% for n in page_obj %}<li{% if not n.is_read %} class="is-unread"{% endif %}>
+      <div><strong>{{ n.title }}</strong>{% if not n.is_read %} <span class="d-badge d-badge--pending">New</span>{% endif %}<p>{{ n.message }}</p><div class="cell-product__sub">{{ n.get_kind_display }} · {{ n.created_at|date:"j M Y, H:i" }}</div></div>
+      <div class="review-list__actions">
+        {% if n.link_url %}<form method="post" action="{% url 'dashboard:notification_read' n.pk %}">{% csrf_token %}<input type="hidden" name="open" value="1"><button class="btn btn--secondary btn--sm" type="submit">Open</button></form>{% endif %}
+        {% if not n.is_read %}<form method="post" action="{% url 'dashboard:notification_read' n.pk %}">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit">Mark read</button></form>{% endif %}
+      </div></li>{% endfor %}
+  </ul>{% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "bell" %}<h3>{% if state == "unread" %}You're all caught up{% else %}No notifications yet{% endif %}</h3><p>New orders, sign-ups and low-stock alerts will appear here.</p></div>{% endif %}
+</section>
+{% endblock %}

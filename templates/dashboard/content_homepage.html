@@ -1,0 +1,14 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Website content{% endblock %}
+{% block content %}
+{% include "dashboard/_page_head.html" with title="Website content" subtitle="Edit the words and images on your public site. Changes appear straight away." %}
+{% include "dashboard/_content_tabs.html" %}
+<div class="d-grid d-grid--2">{% for b in blocks %}
+  <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">{{ b.config.label }}</h2>{% if b.obj and not b.obj.is_published %}<span class="d-badge d-badge--cancelled">Hidden</span>{% elif not b.obj %}<span class="d-badge d-badge--pending">Using default</span>{% endif %}</div>
+    <div class="d-card__body"><p class="muted">{{ b.config.where }}</p>
+      {% if b.obj.image %}<div class="thumb" style="max-width:120px;margin-bottom:12px">{% if b.obj.is_video %}<video src="{{ b.obj.image.url }}" muted preload="metadata" style="max-width:100%"></video>{% else %}<img src="{{ b.obj.image.url }}" alt="" loading="lazy">{% endif %}</div>{% endif %}
+      {% if b.obj.title %}<p><strong>{{ b.obj.title }}</strong></p>{% endif %}
+      <a class="btn btn--secondary btn--sm" href="{% url 'dashboard:content_homepage_edit' b.key %}">Edit</a></div></section>
+{% endfor %}</div>
+<p class="muted" style="margin-top:16px">Banners, featured products, new arrivals and collections are managed under Promotions, Products and Categories.</p>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}{{ person.full_name }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><p><a class="d-link" href="{% url 'dashboard:customers' %}">&larr; Customers</a></p><h1>{{ person.full_name }}</h1><p>{{ person.email }} · {{ person.get_role_display }}{% if not person.is_active %} · deactivated{% endif %}</p></div></div>
+<div class="stat-grid stat-grid--3">
+  <div class="d-card stat"><div class="stat__label">Paid orders</div><div class="stat__value">{{ totals.n }}</div></div>
+  <div class="d-card stat"><div class="stat__label">Total spent</div><div class="stat__value">{{ totals.spent|default:0|naira }}</div></div>
+  <div class="d-card stat"><div class="stat__label">Joined</div><div class="stat__value" style="font-size:1.25rem">{{ person.date_joined|date:"j M Y" }}</div></div>
+</div>
+<div class="d-grid d-grid--2-1">
+  <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Orders</h2></div>
+    {% if orders %}<div class="d-table-wrap"><table class="d-table"><tbody>{% for o in orders %}<tr><td><a class="d-link" href="{% url 'dashboard:order_detail' o.order_number %}">{{ o.order_number }}</a></td><td>{{ o.created_at|date:"j M Y" }}</td><td>{% include "dashboard/_status.html" with status=o.status label=o.get_status_display %}</td><td class="num">{{ o.total|naira }}</td></tr>{% endfor %}</tbody></table></div>
+    {% else %}<div class="d-card__body"><p class="muted">No orders yet.</p></div>{% endif %}</section>
+  <div class="stack">
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Contact</h2></div><div class="d-card__body"><p>{{ person.email }}{% if phone %}<br>{{ phone }}{% endif %}</p>
+      {% for a in addresses %}<address style="margin-top:10px">{% if a.label %}<strong>{{ a.label }}{% if a.is_default %} (default){% endif %}</strong><br>{% endif %}{{ a.line1 }}, {{ a.city }}, {{ a.state }}</address>{% endfor %}</div></section>
+    {% if access_form %}
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Access</h2></div><div class="d-card__body">
+      <form method="post">{% csrf_token %}{% include "dashboard/_form_errors.html" with form=access_form %}
+        {% include "dashboard/_field.html" with field=access_form.role %}{% include "dashboard/_field.html" with field=access_form.is_active %}
+        <p class="muted">Staff handle orders and stock. Managers also run the catalogue and marketing. Administrators can refund and manage access.</p>
+        <button class="btn" type="submit">Save access</button></form></div></section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

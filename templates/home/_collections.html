@@ -1,0 +1,40 @@
+{% load avelle_ui %}
+{% if collections %}
+<section id="collections" class="section collections" aria-labelledby="collections-title">
+  <div class="container">
+    <div class="section__head" data-reveal="up">
+      <div>
+        <span class="eyebrow">Shop by collection</span>
+        <h2 id="collections-title">Dress for every <em>chapter</em></h2>
+      </div>
+    </div>
+    <ul class="collections__grid">
+      {% for item in collections %}
+        <li class="collection" data-reveal="up">
+          <a class="collection__link" href="/shop/?category={{ item.category.slug }}">
+            <span class="collection__media">
+              {# Wrapper is moved by GSAP parallax; the <img> inside only ever gets the CSS hover zoom. #}
+              <span class="collection__parallax" data-parallax-inner>
+                {% if item.category.image %}
+                  <img src="{{ item.category.image.url|cdn:900 }}" alt="" width="900" height="1200" loading="lazy" decoding="async">
+                {% else %}
+                  <span class="collection__placeholder">{% icon "shirt" %}</span>
+                {% endif %}
+              </span>
+              <span class="collection__veil"></span>
+              <span class="collection__title">
+                <span class="collection__index">0{{ forloop.counter }}</span>
+                <span class="collection__name">{{ item.category.name }}</span>
+              </span>
+            </span>
+            <span class="collection__meta">
+              <span class="collection__count">{{ item.count }} piece{{ item.count|pluralize }}</span>
+              <span class="collection__cta">Explore {% icon "arrow-right" "icon--sm" %}</span>
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}

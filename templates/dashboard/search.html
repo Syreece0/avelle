@@ -1,0 +1,15 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Search</h1><p>{% if q %}{{ total }} result{{ total|pluralize }} for “{{ q }}”.{% else %}Type an order number, customer email or product name in the box above.{% endif %}</p></div></div>
+{% if q and not total %}<div class="d-card"><div class="d-empty">{% icon "search" %}<h3>Nothing found</h3><p>Try an order number such as AV-7K3Q9XD2, a customer's email, or part of a product name or SKU.</p></div></div>{% endif %}
+{% if orders %}<section class="d-card" style="margin-bottom:16px"><div class="d-card__head"><h2 class="d-card__title">Orders</h2></div><div class="d-table-wrap"><table class="d-table"><tbody>
+  {% for o in orders %}<tr><td><a class="d-link" href="{% url 'dashboard:order_detail' o.order_number %}">{{ o.order_number }}</a></td><td>{{ o.customer_name }}<div class="cell-product__sub">{{ o.email }}</div></td><td>{% include "dashboard/_status.html" with status=o.status label=o.get_status_display %}</td><td class="num">{{ o.total|naira }}</td></tr>{% endfor %}
+</tbody></table></div></section>{% endif %}
+{% if products %}<section class="d-card" style="margin-bottom:16px"><div class="d-card__head"><h2 class="d-card__title">Products</h2></div><div class="d-table-wrap"><table class="d-table"><tbody>
+  {% for p in products %}<tr><td><a class="d-link" href="{% url 'dashboard:product_edit' p.pk %}">{{ p.name }}</a></td><td>{{ p.get_status_display }}</td><td class="num">{{ p.current_price|naira }}</td></tr>{% endfor %}
+</tbody></table></div></section>{% endif %}
+{% if customers %}<section class="d-card"><div class="d-card__head"><h2 class="d-card__title">People</h2></div><div class="d-table-wrap"><table class="d-table"><tbody>
+  {% for c in customers %}<tr><td><a class="d-link" href="{% url 'dashboard:customer_detail' c.pk %}">{{ c.full_name }}</a></td><td>{{ c.email }}</td><td>{{ c.get_role_display }}</td></tr>{% endfor %}
+</tbody></table></div></section>{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% autoescape off %}Hello {{ order.customer_name }},
+
+We've started a refund of NGN {{ refund.amount|floatformat:2 }} for order {{ order.order_number }}.
+{% if refund.reason %}Reason: {{ refund.reason }}
+{% endif %}
+Refunds usually reach your bank or card within a few working days, depending on your bank.
+
+View your order: {{ site_url }}/orders/{{ order.order_number }}/
+
+AVELLE
+{% endautoescape %}

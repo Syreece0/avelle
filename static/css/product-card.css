@@ -1,0 +1,151 @@
+/* ==========================================================================
+   Floating product card: three independent animation layers
+
+   <li class="product-grid__item">             grid cell. Never animated. Reserves space,
+                                               so floating can never shift the layout.
+     <div class="pc" data-pc>                  LAYER 1  ENTRANCE   (GSAP: x / y / scale / opacity)
+       <div class="pc__float" data-pc-float>   LAYER 2  FLOAT      (GSAP: yoyo y tween, per-card timing)
+         <article class="pc__tilt" data-pc-tilt>  LAYER 3  TILT/LIFT (CSS vars --lift --tilt-x --tilt-y)
+
+   Each layer owns exactly one element, so no two animations ever write the
+   same element's transform. The entrance timeline never touches the float
+   or tilt layers and vice versa.
+
+   JS contract (implemented in Phase 6):
+     - Entrance: gsap.from() on [data-pc]. While pending, set data-pc-state="pending".
+     - Float:    gsap tween on [data-pc-float], started after the entrance completes.
+     - Tilt:     pointermove sets --tilt-x / --tilt-y / --lift on [data-pc-tilt] and adds
+                 .is-tracking (disables the CSS transition while following the pointer).
+     - Reduced motion: none of the three run; hover falls back to a shadow change.
+   Without JS, the CSS below still gives a lift-and-shadow hover.
+   ========================================================================== */
+
+.product-grid {
+  display: grid; gap: var(--space-4) var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* room so floating cards and their shadows are not clipped by parents */
+  padding-block: var(--space-3) var(--space-5);
+}
+@media (min-width: 640px) { .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6) var(--space-5); } }
+@media (min-width: 1100px) { .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-7) var(--space-6); } }
+.product-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 900px) { .product-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.product-grid__item { min-width: 0; }
+
+/* Layer 1: entrance. Hidden only while JS has explicitly marked it pending. */
+.pc { position: relative; height: 100%; }
+.pc[data-pc-state="pending"] { opacity: 0; }
+
+/* Layer 2: float. Perspective lives here so Layer 3 tilts in 3D. */
+.pc__float { height: 100%; perspective: 1000px; }
+
+/* Layer 3: tilt, lift and shadow */
+.pc__tilt {
+  --lift: 0px; --tilt-x: 0deg; --tilt-y: 0deg;
+  position: relative; display: flex; flex-direction: column; height: 100%;
+  background: var(--surface); border-radius: var(--radius-card); box-shadow: var(--shadow-float);
+  transform: translate3d(0, var(--lift), 0) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform-style: preserve-3d;
+  transition: transform var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out);
+}
+.pc__tilt.is-tracking { transition: box-shadow var(--dur-slow) var(--ease-out); } /* JS drives transform directly */
+.pc__tilt.is-active { will-change: transform; }
+
+@media (hover: hover) and (pointer: fine) {
+  .pc__tilt:hover, .pc__tilt:focus-within { --lift: -8px; box-shadow: var(--shadow-float-active); }
+}
+
+/* Media */
+.pc__media { position: relative; display: block; overflow: hidden; border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--champagne); aspect-ratio: 4 / 5; }
+.pc__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 900ms var(--ease-out); }
+.pc__media-alt { position: absolute; inset: 0; opacity: 0; transition: opacity var(--dur-slow) var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .pc__tilt:hover .pc__media img { transform: scale(1.06); }
+  .pc__tilt:hover .pc__media-alt { opacity: 1; }
+}
+.pc__placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: var(--grey); }
+.pc__placeholder .icon { width: 44px; height: 44px; stroke-width: 1; }
+
+.pc__badges { position: absolute; top: var(--space-3); left: var(--space-3); display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+
+/* Wishlist: always visible (essential control, never hover-only) */
+.pc__wish {
+  position: absolute; top: var(--space-2); right: var(--space-2); z-index: 2; width: 44px; height: 44px;
+  display: grid; place-items: center; border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9); color: var(--ink); box-shadow: var(--shadow-sm);
+  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-out);
+}
+.pc__wish:hover { background: var(--white); transform: scale(1.06); }
+.pc__wish[aria-pressed="true"] { color: var(--danger); }
+.pc__wish[aria-pressed="true"] .icon { fill: currentColor; }
+
+/* Body: name and price are always visible */
+.pc__body { display: grid; gap: 2px; padding: var(--space-4) var(--space-4) var(--space-3); flex: 1; align-content: start; }
+.pc__brand { font-size: 10.5px; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--text-muted); }
+.pc__name { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 500; line-height: 1.15; margin: 0; }
+.pc__name a { text-decoration: none; }
+.pc__name a::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: var(--radius-card); } /* whole card is the link */
+.pc__price { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); margin-top: var(--space-2); font-variant-numeric: tabular-nums; font-size: var(--text-sm); }
+.pc__price-now { font-weight: 600; }
+.pc__price-was { color: var(--text-muted); text-decoration: line-through; font-size: var(--text-xs); }
+.pc__price-off { color: var(--gold-text); font-weight: 600; font-size: var(--text-xs); }
+
+/* Extra info and quick controls.
+   Desktop pointer: revealed on hover and on keyboard focus.
+   Touch: always present (no hover to depend on). */
+.pc__extra { position: relative; z-index: 2; padding: 0 var(--space-4) var(--space-4); display: grid; gap: var(--space-3); }
+.pc__sizes { font-size: var(--text-xs); color: var(--text-muted); }
+.pc__sizes strong { color: var(--ink); font-weight: 500; }
+.pc__actions { display: flex; gap: var(--space-2); }
+.pc__actions .btn { flex: 1; min-width: 0; min-height: 44px; padding-inline: var(--space-3); }
+/* Narrow cards (phones, small tablets): stack the buttons so nothing overflows */
+@media (max-width: 899px) { .pc__actions { flex-direction: column; } }
+
+@media (hover: hover) and (pointer: fine) {
+  .pc__extra { max-height: 0; opacity: 0; overflow: hidden; padding-bottom: 0; transition: max-height var(--dur-slow) var(--ease-out), opacity var(--dur) var(--ease-out), padding var(--dur-slow) var(--ease-out); }
+  .pc__tilt:hover .pc__extra, .pc__tilt:focus-within .pc__extra { max-height: 140px; opacity: 1; padding-bottom: var(--space-4); }
+}
+/* Touch: product info stays compact; the details toggle opens the extra row */
+@media (hover: none), (pointer: coarse) {
+  .pc__extra { display: none; }
+  .pc__tilt.is-open .pc__extra { display: grid; }
+  .pc__name { font-size: 1.15rem; }
+}
+.pc__more { display: none; }
+@media (hover: none), (pointer: coarse) {
+  .pc__more { display: inline-grid; position: absolute; right: var(--space-2); bottom: var(--space-2); z-index: 2; width: 44px; height: 44px; place-items: center; border: 0; background: transparent; }
+  .pc__more .icon { transition: transform var(--dur) var(--ease-out); }
+  .pc__tilt.is-open .pc__more .icon { transform: rotate(45deg); }
+  .pc__body { padding-right: 52px; }
+}
+
+/* Sold-out state */
+.pc--soldout .pc__media img { opacity: 0.55; }
+
+/* Loading skeleton: opacity pulse only (no shimmer gradients) */
+.pc--skeleton .pc__tilt { box-shadow: var(--shadow-sm); }
+.pc--skeleton .pc__media { animation: pulse 1.4s ease-in-out infinite; }
+.pc--skeleton .pc__line { height: 12px; border-radius: 6px; background: var(--champagne); animation: pulse 1.4s ease-in-out infinite; }
+.pc--skeleton .pc__line + .pc__line { width: 40%; margin-top: 10px; }
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+/* Reduced motion: remove every transform effect, keep a shadow response */
+@media (prefers-reduced-motion: reduce) {
+  .pc__tilt { transform: none !important; }
+  .pc__media img { transition: none; transform: none !important; }
+  .pc--skeleton .pc__media, .pc--skeleton .pc__line { animation: none; }
+}
+
+/* Results region: reserve height while loading so the page never jumps */
+.results { min-height: 60vh; position: relative; }
+.results.is-loading { pointer-events: none; }
+.empty-state { text-align: center; padding: var(--space-9) var(--space-4); }
+.empty-state h3 { font-size: var(--display-sm); }
+.empty-state p { color: var(--text-muted); max-width: 40ch; margin-inline: auto; }
+
+/* Motion: hide entrance targets only while motion.js is about to animate them (see base.html) */
+.motion-pending .product-grid[data-enter] .pc,
+.motion-pending .pdp__stage, .motion-pending .pdp__info > *, .motion-pending .pdp__thumbs li { opacity: 0; }
+.page-entering #main { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .motion-pending .pc, .motion-pending .pdp__stage, .motion-pending .pdp__info > *, .page-entering #main { opacity: 1; } }

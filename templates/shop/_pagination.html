@@ -1,0 +1,15 @@
+{% with page=result.page %}
+<p class="shop-status" role="status" aria-live="polite">Showing {{ page.end_index }} of {{ result.total }} {% if result.total == 1 %}piece{% else %}pieces{% endif %}</p>
+{% if page.paginator.num_pages > 1 %}
+<nav class="shop-pagination" aria-label="Pages">
+  {% if page.has_previous %}<a class="btn btn--secondary btn--sm" href="{{ result.prev_query }}" rel="prev">Previous</a>{% endif %}
+  <ol>
+    {% for item in result.page_numbers %}
+      {% if item is None %}<li aria-hidden="true">…</li>{% else %}<li><a href="{{ item.href }}"{% if item.n == page.number %} aria-current="page"{% endif %}>{{ item.n }}</a></li>{% endif %}
+    {% endfor %}
+  </ol>
+  {% if page.has_next %}<a class="btn btn--secondary btn--sm" href="{{ result.next_query }}" rel="next">Next</a>{% endif %}
+</nav>
+{% if page.has_next %}<div class="shop-more"><a class="btn btn--secondary" href="{{ result.next_query }}" data-load-more>Load more</a></div>{% endif %}
+{% endif %}
+{% endwith %}

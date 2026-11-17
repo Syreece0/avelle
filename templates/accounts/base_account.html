@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/account.css' %}">{% endblock %}
+{% block content %}
+<section class="section section--tight account">
+  <div class="container">
+    <header class="account__head">
+      <span class="eyebrow">My account</span>
+      <h1>{% block heading %}Hello, {{ user.first_name|default:"there" }}{% endblock %}</h1>
+    </header>
+    <div class="account__layout">
+      <nav class="account__nav" aria-label="Account">
+        <a href="{% url 'accounts:overview' %}"{% if section == "overview" %} aria-current="page"{% endif %}>Overview</a>
+        <a href="{% url 'orders:list' %}"{% if section == "orders" %} aria-current="page"{% endif %}>Orders</a>
+        <a href="{% url 'accounts:notifications' %}"{% if section == "notifications" %} aria-current="page"{% endif %}>Notifications</a>
+        {% if user.is_dashboard_user %}<a href="{% url 'dashboard:overview' %}">Dashboard</a>{% endif %}
+        <a href="{% url 'accounts:profile' %}"{% if section == "profile" %} aria-current="page"{% endif %}>My details</a>
+        <a href="{% url 'accounts:addresses' %}"{% if section == "addresses" %} aria-current="page"{% endif %}>Addresses</a>
+        <a href="{% url 'wishlist:wishlist' %}">Wishlist</a>
+        <a href="{% url 'accounts:password_change' %}"{% if section == "password" %} aria-current="page"{% endif %}>Password</a>
+        <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
+      </nav>
+      <div class="account__main">{% block account_content %}{% endblock %}</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

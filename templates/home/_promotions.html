@@ -1,0 +1,17 @@
+{% load avelle_ui %}{% if promotions %}
+<section class="section section--tight promos" aria-label="Promotions">
+  <div class="container promos__grid{% if promotions|length == 1 %} promos__grid--single{% endif %}">
+    {% for promo in promotions %}
+      <a class="promo" href="{{ promo.link_url|default:'/shop/' }}" data-reveal="up">
+        <img class="promo__img" src="{{ promo.image.url|cdn:1600 }}" alt="" width="1600" height="700" loading="lazy" decoding="async">
+        <span class="promo__veil"></span>
+        <span class="promo__body">
+          <span class="promo__title">{{ promo.title }}</span>
+          {% if promo.subtitle %}<span class="promo__sub">{{ promo.subtitle }}</span>{% endif %}
+          {% if promo.button_text %}<span class="btn btn--light btn--sm">{{ promo.button_text }}</span>{% endif %}
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

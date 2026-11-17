@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Newsletter{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Newsletter</h1><p>{{ totals.active }} active subscriber{{ totals.active|pluralize }} of {{ totals.all }}.</p></div>
+  <div class="page-head__actions"><a class="btn btn--secondary" href="?{% if export_qs %}{{ export_qs }}&amp;{% endif %}export=csv">{% icon "download" "icon--sm" %} Download CSV</a></div></div>
+<section class="d-card">
+  <form class="d-toolbar" method="get" role="search"><div class="search-field">{% icon "search" %}<label class="sr-only" for="nq">Search</label><input id="nq" class="input" type="search" name="q" value="{{ q }}" placeholder="Email address" maxlength="80"></div>
+    <label class="sr-only" for="ns">Status</label><select id="ns" class="select" name="state" data-autosubmit style="width:auto"><option value="">All</option><option value="active"{% if state == "active" %} selected{% endif %}>Active</option><option value="unsubscribed"{% if state == "unsubscribed" %} selected{% endif %}>Unsubscribed</option></select>
+    <button class="btn btn--secondary btn--sm" type="submit">Filter</button></form>
+  {% if page_obj %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Email</th><th>Subscribed</th><th>Status</th><th class="actions"></th></tr></thead><tbody>
+    {% for s in page_obj %}<tr><td>{{ s.email }}</td><td>{{ s.created_at|date:"j M Y" }}</td><td>{% if s.is_active %}<span class="d-badge d-badge--paid">Active</span>{% else %}<span class="d-badge d-badge--cancelled">Unsubscribed</span>{% endif %}</td>
+      <td class="actions"><form method="post" action="{% url 'dashboard:newsletter_toggle' s.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn--ghost btn--sm" type="submit">{% if s.is_active %}Unsubscribe{% else %}Resubscribe{% endif %}</button></form></td></tr>{% endfor %}
+  </tbody></table></div>{% include "dashboard/_pagination.html" %}
+  {% else %}<div class="d-empty">{% icon "mail" %}<h3>No subscribers found</h3><p>People who sign up from the homepage appear here.</p></div>{% endif %}
+</section>
+{% endblock %}

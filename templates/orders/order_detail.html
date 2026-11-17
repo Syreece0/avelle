@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}Order {{ order.order_number }} · AVELLE{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/cart.css' %}"><link rel="stylesheet" href="{% static 'css/account.css' %}"><link rel="stylesheet" href="{% static 'css/orders.css' %}">{% endblock %}
+{% block content %}
+<section class="section section--tight order">
+  <div class="container container--narrow">
+    <span class="eyebrow">Order</span>
+    <h1>{{ order.order_number }}</h1>
+    <p class="order__status"><span class="badge {% if order.is_paid %}badge--ink{% else %}badge--muted{% endif %}">{{ order.get_status_display }}</span>
+      <span class="muted">Placed {{ order.created_at|date:"j M Y, g:i a" }}</span></p>
+
+    {% if order.status == "pending_payment" %}
+      <div class="order__notice" role="status">
+        <p><strong>Payment not completed.</strong> Your items aren't reserved until payment is received.</p>
+        <form method="post" action="{% url 'orders:pay' order.order_number %}">{% csrf_token %}<button class="btn" type="submit" data-loading-form>Pay {{ order.total|naira }} now</button></form>
+      </div>
+    {% elif order.is_paid %}
+      <p class="lead">Thank you{% if order.customer_name %}, {{ order.customer_name|truncatechars:30 }}{% endif %}. We've emailed your confirmation to {{ order.email }}.</p>
+    {% endif %}
+
+    <div class="order__grid">
+      <div>{% include "orders/_order_summary.html" %}</div>
+      <div class="order__side">
+        <section class="acard"><h2>Delivery to</h2>
+          <p>{{ order.customer_name }}<br>{{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}<br>{{ order.city }}, {{ order.state }}{% if order.landmark %}<br>Near {{ order.landmark }}{% endif %}<br>{{ order.phone }}</p>
+          {% if order.tracking_number %}<p><strong>Tracking:</strong> {{ order.courier }} {{ order.tracking_number }}</p>{% endif %}</section>
+        <section class="acard"><h2>Progress</h2>
+          <ol class="timeline">
+            {% for h in order.status_history.all %}<li><strong>{{ h.get_to_status_display }}</strong><span>{{ h.created_at|date:"j M, g:i a" }}</span>{% if h.note and "STOCK SHORTFALL" not in h.note and "refund required" not in h.note and "mismatch" not in h.note %}<small>{{ h.note }}</small>{% endif %}</li>{% endfor %}
+          </ol></section>
+      </div>
+    </div>
+    <p>{% if user.is_authenticated %}<a class="btn btn--ghost" href="{% url 'orders:list' %}">All orders</a>{% endif %} <a class="btn btn--ghost" href="/shop/">Continue shopping</a></p>
+  </div>
+</section>
+{% endblock %}

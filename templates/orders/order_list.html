@@ -1,0 +1,19 @@
+{% extends "accounts/base_account.html" %}
+{% load avelle_ui %}
+{% block title %}My orders · AVELLE{% endblock %}
+{% block heading %}My orders{% endblock %}
+{% block account_content %}
+{% if orders %}
+  <ul class="addr-list">
+    {% for o in orders %}
+      <li class="acard">
+        <h2>{{ o.order_number }} <span class="badge {% if o.is_paid %}badge--ink{% else %}badge--muted{% endif %}">{{ o.get_status_display }}</span></h2>
+        <p>{{ o.created_at|date:"j M Y" }} · {{ o.items.all|length }} item{{ o.items.all|length|pluralize }} · <strong>{{ o.total|naira }}</strong></p>
+        <div class="acard__actions"><a class="btn btn--secondary btn--sm" href="{% url 'orders:detail' o.order_number %}">View order</a></div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="muted">You haven't placed an order yet.</p><p><a class="btn" href="/shop/">Start shopping</a></p>
+{% endif %}
+{% endblock %}

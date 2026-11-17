@@ -1,0 +1,22 @@
+{% autoescape off %}Hello {{ order.customer_name }},
+
+Thank you for your order. We've received your payment and are getting it ready.
+
+Order: {{ order.order_number }}
+
+{% for item in order.items.all %}{{ item.quantity }} x {{ item.product_name }} ({{ item.colour_name }}, {{ item.size_name }})  NGN {{ item.line_total|floatformat:2 }}
+{% endfor %}
+Subtotal: NGN {{ order.subtotal|floatformat:2 }}{% if order.discount_amount %}
+Discount: -NGN {{ order.discount_amount|floatformat:2 }}{% endif %}
+Delivery ({{ order.delivery_zone_name }}): NGN {{ order.delivery_charge|floatformat:2 }}
+Total: NGN {{ order.total|floatformat:2 }}
+
+Delivering to:
+{{ order.customer_name }}
+{{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}
+{{ order.city }}, {{ order.state }}
+
+View your order: {{ site_url }}/orders/{{ order.order_number }}/
+
+AVELLE
+{% endautoescape %}

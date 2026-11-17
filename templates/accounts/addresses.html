@@ -1,0 +1,24 @@
+{% extends "accounts/base_account.html" %}
+{% load avelle_ui %}
+{% block title %}Addresses · AVELLE{% endblock %}
+{% block heading %}Addresses{% endblock %}
+{% block account_content %}
+{% if addresses %}
+  <ul class="addr-list">
+    {% for a in addresses %}
+      <li class="acard">
+        <h2>{{ a.label|default:"Address" }}{% if a.is_default %} <span class="badge badge--ink">Default</span>{% endif %}</h2>
+        <p>{{ a.recipient_name }}<br>{{ a.line1 }}{% if a.line2 %}, {{ a.line2 }}{% endif %}<br>{{ a.city }}, {{ a.state }}{% if a.landmark %}<br>Near {{ a.landmark }}{% endif %}<br>{{ a.phone }}</p>
+        <div class="acard__actions">
+          <a class="btn btn--secondary btn--sm" href="{% url 'accounts:address_edit' a.pk %}">Edit</a>
+          {% if not a.is_default %}<form method="post" action="{% url 'accounts:address_default' a.pk %}">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit">Make default</button></form>{% endif %}
+          <form method="post" action="{% url 'accounts:address_delete' a.pk %}" data-confirm="Remove this address?">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit">Remove</button></form>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="muted">You haven't saved an address yet.</p>
+{% endif %}
+<p><a class="btn" href="{% url 'accounts:address_add' %}">{% icon "plus" "icon--sm" %} Add an address</a></p>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% load avelle_ui %}
+{% comment %}
+Sidebar navigation. The dashboard views (Phase 9) pass `nav_items`: a list of dicts
+{key, label, icon, url, count}. `active_nav` holds the key of the current section.
+The 14 sections are: overview, products, categories, inventory, orders, customers, payments,
+promotions, discounts, reviews, notifications, content, reports, settings.
+{% endcomment %}
+<aside class="dash-sidebar" aria-label="Dashboard navigation">
+  <div class="dash-brand">
+    <a class="wordmark wordmark--light" href="/" aria-label="AVELLE">AVELLE</a>
+    <span class="dash-brand__tag">Admin</span>
+  </div>
+  <nav class="dash-nav">
+    {% for item in nav_items %}
+      {% if item.group %}<div class="dash-nav__label">{{ item.group }}</div>{% endif %}
+      <a class="dash-nav__link" href="{{ item.url }}"{% if item.key == active_nav %} aria-current="page"{% endif %}>
+        {% icon item.icon %}<span>{{ item.label }}</span>
+        {% if item.count %}<span class="dash-nav__count">{{ item.count }}</span>{% endif %}
+      </a>
+    {% endfor %}
+  </nav>
+  <div class="dash-sidebar__foot">
+    <a class="dash-nav__link" href="/accounts/logout/">{% icon "logout" %}<span>Sign out</span></a>
+  </div>
+</aside>

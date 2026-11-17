@@ -1,0 +1,22 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}{% if address %}Edit address{% else %}New address{% endif %} · AVELLE{% endblock %}
+{% block heading %}{% if address %}Edit address{% else %}New address{% endif %}{% endblock %}
+{% block account_content %}
+<form method="post" class="auth__form" novalidate data-loading-form>
+  {% csrf_token %}
+  {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+  {% if form.non_field_errors %}<div class="auth__error" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+  {% include "components/form_field.html" with field=form.label %}
+  {% include "components/form_field.html" with field=form.recipient_name %}
+  {% include "components/form_field.html" with field=form.phone %}
+  {% include "components/form_field.html" with field=form.line1 %}
+  {% include "components/form_field.html" with field=form.line2 %}
+  <div class="auth__row">
+    {% include "components/form_field.html" with field=form.city %}
+    {% include "components/form_field.html" with field=form.state %}
+  </div>
+  {% include "components/form_field.html" with field=form.landmark %}
+  <label class="check"><input type="checkbox" name="is_default" value="on"{% if form.is_default.value %} checked{% endif %}><span>{{ form.is_default.label }}</span></label>
+  <div class="acard__actions"><button class="btn" type="submit">Save address</button><a class="btn btn--ghost" href="{% url 'accounts:addresses' %}">Cancel</a></div>
+</form>
+{% endblock %}

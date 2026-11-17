@@ -1,0 +1,17 @@
+{% comment %}One form field in the dashboard: switch for single checkboxes, checkbox grid for multiple choice, otherwise the standard field.{% endcomment %}
+{% if field.widget_type == "checkbox" %}
+  <div class="field{% if field.errors %} has-error{% endif %}">
+    <label class="switch" for="{{ field.id_for_label }}">{{ field }}<span>{{ field.label }}</span></label>
+    {% if field.help_text %}<p class="field__help">{{ field.help_text }}</p>{% endif %}
+    {% for error in field.errors %}<p class="field__error" role="alert">{{ error }}</p>{% endfor %}
+  </div>
+{% elif field.widget_type == "checkboxselectmultiple" %}
+  <fieldset class="field{% if field.errors %} has-error{% endif %}">
+    <legend class="field__label">{{ field.label }}{% if field.field.required %} <span class="req" aria-hidden="true">*</span>{% endif %}</legend>
+    <div class="check-grid">{{ field }}</div>
+    {% if field.help_text %}<p class="field__help">{{ field.help_text }}</p>{% endif %}
+    {% for error in field.errors %}<p class="field__error" role="alert">{{ error }}</p>{% endfor %}
+  </fieldset>
+{% else %}
+  {% include "components/form_field.html" %}
+{% endif %}

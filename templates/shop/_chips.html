@@ -1,0 +1,8 @@
+{% load avelle_ui %}{% if result.chips %}
+<ul class="chips" aria-label="Active filters">
+  {% for chip in result.chips %}
+    <li class="chip">{{ chip.label }}<a class="chip__remove" href="{{ chip.href }}" aria-label="Remove filter {{ chip.label }}">{% icon "close" %}</a></li>
+  {% endfor %}
+  <li><a class="chip chip--clear" href="{% if f.q %}/shop/?q={{ f.q|urlencode }}{% else %}/shop/{% endif %}">Clear all</a></li>
+</ul>
+{% endif %}

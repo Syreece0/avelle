@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}{{ result.heading }} · AVELLE{% endblock %}
+{% block meta_description %}Browse {{ result.heading|lower }} at AVELLE. Filter by size, colour, brand and price.{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/shop.css' %}">
+  {% if f.page > 1 or f.active_count or f.q %}<meta name="robots" content="noindex,follow">{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container shop" data-shop data-endpoint="{% url 'catalog:shop' %}">
+  <nav aria-label="Breadcrumb"><ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="{% url 'catalog:shop' %}">Shop</a></li>
+    {% if result.root %}<li{% if not result.target %} aria-current="page"{% endif %}>{% if result.target %}<a href="/shop/?category={{ result.root.slug }}">{{ result.root.name }}</a>{% else %}{{ result.root.name }}{% endif %}</li>{% endif %}
+    {% if result.target %}<li aria-current="page">{{ result.target.name }}</li>{% endif %}
+  </ol></nav>
+
+  <header class="shop__head" data-reveal="up">
+    <div>
+      <h1 data-shop-heading>{{ result.heading }}</h1>
+      <p class="shop__count"><span data-shop-total>{{ result.total }}</span> {% if result.total == 1 %}piece{% else %}pieces{% endif %}</p>
+    </div>
+  </header>
+
+  <nav class="shop-tabs" aria-label="Collections" data-shop-tabs>
+    <a class="shop-tab{% if not result.root %} is-active{% endif %}" href="{{ result.all_href }}" data-shop-link{% if not result.root %} aria-current="true"{% endif %}>All <span class="shop-tab__n">{{ result.all_count }}</span></a>
+    {% for tab in result.tabs %}
+      <a class="shop-tab{% if tab.selected %} is-active{% endif %}" href="{{ tab.href }}" data-shop-link{% if tab.selected %} aria-current="true"{% endif %}>{{ tab.name }} <span class="shop-tab__n">{{ tab.count }}</span></a>
+    {% endfor %}
+  </nav>
+  <div data-shop-types>{% include "shop/_types.html" %}</div>
+
+  <div class="shop-toolbar">
+    <button class="btn btn--secondary btn--sm shop-toolbar__filters" type="button" data-dialog-open="filters-drawer">{% icon "filter" "icon--sm" %} Filters{% if f.active_count %} <span class="dropdown__count" data-filter-badge>{{ f.active_count }}</span>{% endif %}</button>
+    <form class="shop-sort" method="get" action="{% url 'catalog:shop' %}" data-sort-form>
+      {% for key, value in f.pairs %}{% if key != "sort" and key != "page" %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+      <label for="sort">Sort by</label>
+      <select class="select" id="sort" name="sort" data-sort-select>
+        {% for s in result.sorts %}<option value="{{ s.value }}"{% if s.selected %} selected{% endif %}>{{ s.label }}</option>{% endfor %}
+      </select>
+      <noscript><button class="btn btn--sm" type="submit">Sort</button></noscript>
+    </form>
+  </div>
+
+  <div data-shop-chips>{% include "shop/_chips.html" %}</div>
+
+  <div class="shop__layout">
+    <aside class="shop__filters" aria-label="Filters" data-filters-home>
+      {% include "shop/_filters.html" %}
+    </aside>
+    <section class="shop__results" aria-label="Products" aria-busy="false" data-shop-results>
+      <h2 class="sr-only">Products</h2>
+      <ul class="product-grid" data-product-grid data-enter="mixed">{% include "shop/_results.html" %}</ul>
+      <div class="shop__pager" data-shop-pager>{% include "shop/_pagination.html" %}</div>
+    </section>
+  </div>
+</div>
+
+<dialog id="filters-drawer" class="drawer drawer--right" aria-label="Filters">
+  <div class="drawer__head">
+    <h2 class="modal__title">Filters</h2>
+    <button class="icon-btn" type="button" data-dialog-close aria-label="Close filters">{% icon "close" %}</button>
+  </div>
+  <div class="drawer__filters" data-filters-drawer-body></div>
+  <div class="drawer__foot"><button class="btn btn--block" type="button" data-dialog-close data-show-results>Show <span data-shop-total-copy>{{ result.total }}</span> results</button></div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/shop.js' %}" defer></script>
+{% endblock %}

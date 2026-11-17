@@ -1,0 +1,21 @@
+# Django 5.2 is a Long-Term Support release (security fixes until April 2028).
+Django>=5.2,<5.3
+
+# Database
+psycopg[binary]>=3.2
+dj-database-url>=2.2
+
+# Config
+python-dotenv>=1.0
+
+# Images and media
+Pillow>=10.4
+cloudinary>=1.41
+django-cloudinary-storage>=0.3.0
+
+# Serving
+gunicorn>=23.0
+whitenoise>=6.7
+
+# Paystack server-side API calls
+requests>=2.32

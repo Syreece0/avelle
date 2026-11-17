@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}Checkout · AVELLE{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/cart.css' %}"><link rel="stylesheet" href="{% static 'css/account.css' %}"><link rel="stylesheet" href="{% static 'css/orders.css' %}">{% endblock %}
+{% block content %}
+<section class="section section--tight checkout">
+  <div class="container">
+    <h1>Checkout</h1>
+    {% if not user.is_authenticated %}<p class="muted">Have an account? <a href="{% url 'accounts:login' %}?next=/checkout/">Sign in</a> to use your saved details, or continue as a guest.</p>{% endif %}
+    <div class="checkout__layout">
+      <form method="post" class="checkout__form" novalidate data-checkout data-quote-url="{% url 'orders:quote' %}">
+        {% csrf_token %}
+        {% if form.errors and not form.non_field_errors %}<div class="auth__error" role="alert"><p>Please check the highlighted fields.</p></div>{% endif %}
+
+        <fieldset class="checkout__block"><legend>Contact</legend>
+          {% include "components/form_field.html" with field=form.email %}
+          {% include "components/form_field.html" with field=form.phone %}
+        </fieldset>
+
+        <fieldset class="checkout__block"><legend>Delivery address</legend>
+          {% if saved_addresses %}
+            <div class="field"><label class="field__label" for="saved-address">Use a saved address</label>
+              <select class="select" id="saved-address" data-saved-address>
+                <option value="">Enter a new address</option>
+                {% for a in saved_addresses %}<option value="{{ a.pk }}" data-name="{{ a.recipient_name }}" data-phone="{{ a.phone }}" data-line1="{{ a.line1 }}" data-line2="{{ a.line2 }}" data-city="{{ a.city }}" data-state="{{ a.state }}" data-landmark="{{ a.landmark }}">{{ a.label|default:"Address" }}: {{ a.line1 }}, {{ a.city }}</option>{% endfor %}
+              </select></div>
+          {% endif %}
+          {% include "components/form_field.html" with field=form.customer_name %}
+          {% include "components/form_field.html" with field=form.address_line1 %}
+          {% include "components/form_field.html" with field=form.address_line2 %}
+          <div class="auth__row">
+            {% include "components/form_field.html" with field=form.city %}
+            {% include "components/form_field.html" with field=form.state %}
+          </div>
+          <p class="checkout__eta" data-eta role="status" aria-live="polite">{% if quote.zone %}Delivery in {{ quote.eta }}.{% endif %}</p>
+          {% include "components/form_field.html" with field=form.landmark %}
+          {% include "components/form_field.html" with field=form.delivery_note %}
+          {% if user.is_authenticated %}<label class="check"><input type="checkbox" name="save_address" value="on"{% if form.save_address.value %} checked{% endif %}><span>{{ form.save_address.label }}</span></label>{% endif %}
+        </fieldset>
+
+        <fieldset class="checkout__block"><legend>Discount code</legend>
+          <div class="checkout__code">
+            {{ form.discount_code }}
+            <button class="btn btn--secondary" type="button" data-apply-code>Apply</button>
+          </div>
+          {% for e in form.discount_code.errors %}<p class="field__error" role="alert">{{ e }}</p>{% endfor %}
+          <p class="checkout__codemsg" data-code-message role="status" aria-live="polite">{% if quote.code %}{{ quote.code_message }}{% endif %}</p>
+        </fieldset>
+
+        <button class="btn btn--block checkout__pay" type="submit" data-pay>Pay <span data-q="total">{% if quote.total %}{{ quote.total|naira }}{% else %}now{% endif %}</span> securely</button>
+        <p class="checkout__secure">{% icon "card" "icon--sm" %} Payment is handled by Paystack. We never see or store your card details.</p>
+      </form>
+
+      <aside class="cart-summary checkout__summary" aria-label="Order summary">
+        <h2>Order summary</h2>
+        <ul class="mini-lines">
+          {% for line in summary.lines %}
+            <li><span class="mini-lines__img">{% if line.image %}<img src="{{ line.image.image.url|cdn:120 }}" alt="" width="56" height="70">{% endif %}<span class="mini-lines__qty">{{ line.quantity }}</span></span>
+              <span class="mini-lines__name">{{ line.product.name }}<small>{{ line.variant.colour.name }} · {{ line.variant.size.name }}</small></span>
+              <span class="price">{{ line.line_total|naira }}</span></li>
+          {% endfor %}
+        </ul>
+        <dl>
+          <div><dt>Subtotal</dt><dd class="price" data-q="subtotal">{{ quote.subtotal|naira }}</dd></div>
+          <div data-row="discount"{% if not quote.discount %} hidden{% endif %}><dt>Discount</dt><dd class="price">−<span data-q="discount">{{ quote.discount|naira }}</span></dd></div>
+          <div><dt>Delivery</dt><dd data-q="delivery">{% if quote.delivery is None %}Choose your state{% elif quote.free_delivery %}Free{% else %}{{ quote.delivery|naira }}{% endif %}</dd></div>
+          <div class="cart-summary__total"><dt>Total</dt><dd class="price" data-q="total">{% if quote.total is None %}-{% else %}{{ quote.total|naira }}{% endif %}</dd></div>
+        </dl>
+        <a class="btn btn--ghost btn--block" href="{% url 'cart:cart' %}">Edit bag</a>
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/checkout.js' %}" defer></script>{% endblock %}

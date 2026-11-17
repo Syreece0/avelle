@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}AVELLE · {{ site.tagline|default:"Considered fashion for men, women and children" }}{% endblock %}
+{% block meta_description %}{{ hero.body|truncatechars:155 }}{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  {# Hide the hero's reveal targets only when motion is allowed; a failsafe removes this if scripts are slow or blocked. #}
+  <script>
+    (function () {
+      var r = document.documentElement;
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        r.classList.add("hero-pending");
+        setTimeout(function () { r.classList.remove("hero-pending"); }, 3500);
+      }
+    })();
+  </script>
+{% endblock %}
+
+{% block content %}
+  {% include "home/_hero.html" %}
+  {% include "home/_intro.html" %}
+  {% include "home/_collections.html" %}
+  {% include "home/_products.html" with items=featured_products section_id="featured" eyebrow="Selected for you" title="Featured pieces" link="/shop/?featured=1" link_label="View all" enter="mixed" %}
+  {% include "home/_products.html" with items=new_arrivals section_id="new" eyebrow="Just in" title="New arrivals" link="/shop/?new=1" link_label="Shop new in" tone="champagne" enter="left" %}
+  {% include "home/_editorial.html" %}
+  {% include "home/_promotions.html" %}
+  {% include "home/_newsletter.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/home.js' %}" defer></script>
+{% endblock %}

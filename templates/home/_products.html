@@ -1,0 +1,22 @@
+{% comment %}
+Product section for the homepage.
+Params: items, section_id, eyebrow, title, link, link_label, tone ("champagne" or empty), enter (up|left|right|mixed)
+{% endcomment %}
+{% if items %}
+<section class="section section--tight products{% if tone == 'champagne' %} section--champagne{% endif %}" aria-labelledby="{{ section_id }}-title">
+  <div class="container">
+    <div class="section__head" data-reveal="up">
+      <div>
+        <span class="eyebrow">{{ eyebrow }}</span>
+        <h2 id="{{ section_id }}-title">{{ title }}</h2>
+      </div>
+      <a class="btn btn--ghost" href="{{ link }}">{{ link_label }}</a>
+    </div>
+    <ul class="product-grid rail" data-enter="{{ enter|default:'mixed' }}">
+      {% for product in items %}
+        {% include "components/product_card.html" with product=product %}
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}

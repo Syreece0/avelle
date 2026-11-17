@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static avelle_ui %}
+{% block title %}{{ product.name }} · AVELLE{% endblock %}
+{% block meta_description %}{{ product.short_description|default:product.description|truncatechars:155 }}{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/shop.css' %}">
+  <link rel="stylesheet" href="{% static 'css/product-detail.css' %}">
+  <meta property="og:title" content="{{ product.name }} · AVELLE">
+  <meta property="og:type" content="product">
+  {% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+  <script type="application/ld+json">{{ json_ld|safe }}</script>
+{% endblock %}
+
+{% block content %}
+<div class="container pdp" data-pdp data-product-id="{{ product.pk }}" data-currency="{{ currency_symbol }}">
+  <nav aria-label="Breadcrumb"><ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="{% url 'catalog:shop' %}">Shop</a></li>
+    {% for c in crumbs %}
+      <li>{% if forloop.first %}<a href="/shop/?category={{ c.slug }}">{{ c.name }}</a>{% else %}<a href="/shop/?category={{ root.slug }}&amp;type={{ c.slug }}">{{ c.name }}</a>{% endif %}</li>
+    {% endfor %}
+    <li aria-current="page">{{ product.name }}</li>
+  </ol></nav>
+
+  <div class="pdp__grid">
+    {# ---------- Gallery ---------- #}
+    <div class="pdp__gallery" data-gallery>
+      <div class="pdp__stage">
+        {% if images %}
+          <button class="pdp__zoom" type="button" data-gallery-open aria-label="Open larger image of {{ product.name }}">
+            <img class="pdp__main" src="{{ images.0.image.url }}" alt="{{ images.0.alt_text|default:product.name }}" width="960" height="1200" data-gallery-main>
+          </button>
+          {% if images|length > 1 %}
+            <button class="pdp__nav pdp__nav--prev" type="button" data-gallery-step="-1" aria-label="Previous image">{% icon "chevron-left" %}</button>
+            <button class="pdp__nav pdp__nav--next" type="button" data-gallery-step="1" aria-label="Next image">{% icon "chevron-right" %}</button>
+          {% endif %}
+        {% else %}
+          <div class="pdp__noimg">{% icon "shirt" %}</div>
+        {% endif %}
+        <div class="pc__badges pdp__badges">
+          {% if product.is_new_arrival %}<span class="badge badge--ink">New</span>{% endif %}
+          {% if product.has_discount %}<span class="badge badge--gold">-{{ product.discount_percent }}%</span>{% endif %}
+        </div>
+      </div>
+      {% if images|length > 1 %}
+        <ul class="pdp__thumbs" aria-label="Product images">
+          {% for img in images %}
+            <li><button type="button" class="pdp__thumb{% if forloop.first %} is-active{% endif %}" data-gallery-thumb="{{ forloop.counter0 }}" data-src="{{ img.image.url }}" data-alt="{{ img.alt_text|default:product.name }}" aria-label="Show image {{ forloop.counter }} of {{ images|length }}"{% if forloop.first %} aria-current="true"{% endif %}>
+              <img src="{{ img.image.url }}" alt="" width="120" height="150" loading="lazy" decoding="async"></button></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    {# ---------- Purchase panel ---------- #}
+    <div class="pdp__info">
+      {% if product.brand %}<span class="eyebrow">{{ product.brand.name }}</span>{% endif %}
+      <h1 class="pdp__title">{{ product.name }}</h1>
+
+      {% if rating_count %}<a class="pdp__rating" href="#reviews" aria-label="Rated {{ rating_avg }} out of 5, {{ rating_count }} reviews">{% icon "star" "icon--sm" %} <strong>{{ rating_avg }}</strong> <span>({{ rating_count }})</span></a>{% endif %}
+
+      <p class="pdp__price price">
+        <span data-price-now>{{ product.current_price|naira }}</span>
+        {% if product.has_discount %}<span class="pc__price-was" data-price-was>{{ product.price|naira }}</span>{% endif %}
+      </p>
+      {% if product.short_description %}<p class="pdp__lead">{{ product.short_description }}</p>{% endif %}
+
+      {% if not any_stock %}
+        <p class="pdp__soldout" role="status">{% icon "info" "icon--sm" %} This piece is currently sold out.</p>
+      {% endif %}
+
+      <form class="pdp__form" data-pdp-form method="post" action="{% url 'cart:add' %}" novalidate>
+        {% csrf_token %}<input type="hidden" name="product" value="{{ product.pk }}">
+        {% if colours %}
+        <fieldset class="pdp__field" data-group="colour">
+          <legend>Colour <span class="pdp__chosen" data-chosen="colour">{% if single_colour %}{{ colours.0.name }}{% endif %}</span></legend>
+          <div class="option-group">
+            {% for c in colours %}
+              <label class="option" data-option="colour" data-value="{{ c.pk }}" title="{{ c.name }}">
+                <input type="radio" name="colour" value="{{ c.pk }}" data-name="{{ c.name }}"{% if single_colour %} checked{% endif %}>
+                <span class="option__label swatch" style="--swatch: {{ c.hex_code }}"></span>
+                <span class="sr-only">{{ c.name }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+        {% endif %}
+
+        {% if sizes %}
+        <fieldset class="pdp__field" data-group="size">
+          <legend>Size <span class="pdp__chosen" data-chosen="size">{% if single_size %}{{ sizes.0.name }}{% endif %}</span></legend>
+          <div class="option-group">
+            {% for s in sizes %}
+              <label class="option" data-option="size" data-value="{{ s.pk }}">
+                <input type="radio" name="size" value="{{ s.pk }}" data-name="{{ s.name }}"{% if single_size %} checked{% endif %}>
+                <span class="option__label">{{ s.name }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          {% if size_guide %}<button class="btn btn--ghost btn--sm pdp__guide" type="button" data-dialog-open="size-guide">Size guide</button>{% endif %}
+        </fieldset>
+        {% endif %}
+
+        <p class="pdp__message" role="status" aria-live="polite" data-message>{% if not any_stock %}Sold out{% endif %}</p>
+
+        <div class="pdp__buy">
+          <div class="qty" data-qty>
+            <button type="button" data-qty-step="-1" aria-label="Decrease quantity">{% icon "minus" "icon--sm" %}</button>
+            <input type="number" name="quantity" value="1" min="1" max="10" inputmode="numeric" aria-label="Quantity" data-qty-input>
+            <button type="button" data-qty-step="1" aria-label="Increase quantity">{% icon "plus" "icon--sm" %}</button>
+          </div>
+          <button class="btn pdp__add" type="submit" data-add{% if not any_stock %} disabled{% endif %}>{% icon "bag" "icon--sm" %} Add to bag</button>
+          <button class="pdp__wish btn btn--secondary" type="button" data-wishlist-toggle="{{ product.pk }}" aria-pressed="{% if product.pk in wishlist_ids %}true{% else %}false{% endif %}" aria-label="Save {{ product.name }} to wishlist">{% icon "heart" %}</button>
+        </div>
+      </form>
+
+      <div class="pdp__details">
+        <details open><summary>Description {% icon "chevron-down" "icon--sm" %}</summary><div class="prose">{{ product.description|linebreaks }}</div></details>
+        <details><summary>Delivery and returns {% icon "chevron-down" "icon--sm" %}</summary>
+          <div class="prose"><p>Delivery across Nigeria. The delivery charge depends on your state and is shown at checkout before you pay.</p></div></details>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- Reviews ---------- #}
+  <section class="pdp__reviews" id="reviews" aria-labelledby="reviews-title">
+    <h2 id="reviews-title">Reviews</h2>
+    {% if reviews %}
+      <p class="pdp__summary">{% icon "star" "icon--sm" %} <strong>{{ rating_avg }}</strong> out of 5 · {{ rating_count }} review{{ rating_count|pluralize }}</p>
+      <ul class="reviews">
+        {% for r in reviews %}
+          <li class="review">
+            <div class="review__top"><span class="review__stars" role="img" aria-label="{{ r.rating }} out of 5">{% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+              <strong>{{ r.title }}</strong></div>
+            {% if r.body %}<p>{{ r.body }}</p>{% endif %}
+            <p class="review__meta">{{ r.name }}{% if r.verified %} · Verified purchase{% endif %} · {{ r.date|date:"j M Y" }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="pdp__noreviews">No reviews yet.</p>
+    {% endif %}
+  </section>
+</div>
+
+{% if related %}
+<section class="section section--tight section--champagne products" aria-labelledby="related-title">
+  <div class="container">
+    <div class="section__head" data-reveal="up"><div><span class="eyebrow">You may also like</span><h2 id="related-title">Related pieces</h2></div></div>
+    <ul class="product-grid" data-enter="up">
+      {% for p in related %}{% include "components/product_card.html" with product=p %}{% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% if size_guide %}
+<dialog id="size-guide" class="modal modal--sm" aria-labelledby="size-guide-title">
+  <div class="modal__head"><h2 class="modal__title" id="size-guide-title">Size guide</h2><button class="icon-btn" type="button" data-dialog-close aria-label="Close">{% icon "close" %}</button></div>
+  <div class="modal__body"><div class="prose pdp__guide-text">{{ size_guide|linebreaks }}</div></div>
+</dialog>
+{% endif %}
+
+<dialog id="lightbox" class="lightbox" aria-label="Image viewer">
+  <button class="icon-btn lightbox__close" type="button" data-dialog-close aria-label="Close image viewer">{% icon "close" %}</button>
+  <button class="lightbox__nav lightbox__nav--prev" type="button" data-lightbox-step="-1" aria-label="Previous image">{% icon "chevron-left" %}</button>
+  <img class="lightbox__img" alt="" data-lightbox-img>
+  <button class="lightbox__nav lightbox__nav--next" type="button" data-lightbox-step="1" aria-label="Next image">{% icon "chevron-right" %}</button>
+</dialog>
+
+{{ matrix_json|json_script:"pdp-variants" }}
+{{ images_json|json_script:"pdp-images" }}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/product.js' %}" defer></script>
+{% endblock %}

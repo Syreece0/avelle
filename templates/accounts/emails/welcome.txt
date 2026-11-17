@@ -1,0 +1,8 @@
+{% autoescape off %}Hello {{ user.first_name|default:"there" }},
+
+Welcome to AVELLE. Your account is ready: you can save favourites, check out faster and follow your orders.
+
+Start browsing: {{ site_url }}/shop/
+
+AVELLE
+{% endautoescape %}
