@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from apps.catalog.models import Category, Product, ProductVariant
 from apps.catalog.selectors import storefront_products
-from apps.content.models import SiteContent
+from apps.content.models import LOOKBOOK_MAX, LOOKBOOK_MIN, LookbookSlide, SiteContent, SiteSettings
 from apps.promotions.models import Promotion
 
 HERO_KEY = "hero"
@@ -46,6 +46,18 @@ NEW_LIMIT = 8
 def _text(block, field, default_key, default_field):
     value = getattr(block, field, "") if block else ""
     return value or DEFAULTS.get(default_key, {}).get(default_field, "")
+
+
+def build_lookbook():
+    """Slides for the carousel hero, or [] when the admin hasn't chosen it or has too few usable slides."""
+    if SiteSettings.load().hero_style != SiteSettings.HeroStyle.CAROUSEL:
+        return []
+    slides = []
+    for slide in LookbookSlide.objects.filter(is_active=True).select_related("product")[:LOOKBOOK_MAX]:
+        if slide.product_id and slide.product.status != Product.Status.PUBLISHED:
+            continue  # a draft product would lead to a 404
+        slides.append(slide)
+    return slides if len(slides) >= LOOKBOOK_MIN else []
 
 
 def build_homepage_context():
@@ -98,6 +110,7 @@ def build_homepage_context():
 
     return {
         "hero": hero,
+        "lookbook": build_lookbook(),
         "intro": intro,
         "editorial": editorial,
         "collections": collections,

@@ -152,3 +152,11 @@ See `TESTING.md`. `python tools/run_checks.py` runs the static project checker, 
 ## Light glass theme
 
 `static/css/glass.css` (loaded last on the storefront and dashboard) restyles the site as frosted glass in the same ivory/champagne/ink/gold palette: translucent panels with light edges, a soft glow behind the page, glossy buttons, a dark-glass dashboard sidebar. Backdrop blur is used only on large surfaces for performance, and it falls back to solid colours when the browser lacks `backdrop-filter` or the visitor asks for reduced transparency or more contrast. To tune it, edit the `--glass-*` tokens at the top of that file; to remove it, delete the two `<link>` lines in `templates/base.html` and `templates/dashboard/base.html`.
+
+## Lookbook carousel hero
+
+Dashboard > Website content > **Lookbook**: choose "Lookbook carousel" as the hero style and add 3-10 slides
+(image, headline, subheadline, button text, and a product or any link). Each picture's words and button appear
+only while it is at the front; it holds 5 seconds, then the ring turns one card. The ring leans toward the cursor.
+With fewer than 3 active slides the normal hero is shown. Portrait images (about 4:5) work best.
+After pulling this change run `python manage.py makemigrations content catalog promotions && python manage.py migrate`.

@@ -2,7 +2,7 @@ from django.db import models
 
 from apps.core.models import TimeStampedModel
 from apps.core.storage import homepage_media_storage
-from apps.core.validators import is_video_name, validate_media_extension, validate_media_size
+from apps.core.validators import is_video_name, validate_image_extension, validate_image_size, validate_media_extension, validate_media_size
 
 
 class SiteContent(TimeStampedModel):
@@ -55,6 +55,12 @@ class SiteSettings(models.Model):
     facebook_url = models.URLField(blank=True)
     tiktok_url = models.URLField(blank=True)
     x_url = models.URLField(blank=True)
+
+    class HeroStyle(models.TextChoices):
+        MEDIA = "media", "Photo or video"
+        CAROUSEL = "carousel", "Lookbook carousel"
+
+    hero_style = models.CharField(max_length=10, choices=HeroStyle.choices, default=HeroStyle.MEDIA)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -75,6 +81,58 @@ class SiteSettings(models.Model):
     def load(cls):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
+
+
+LOOKBOOK_MIN = 3   # fewer than this and the homepage uses the normal hero
+LOOKBOOK_MAX = 10
+
+
+def clean_link(value):
+    """Allow a site path (/shop/...) or a web address (https://...). Anything else, such as javascript:, is refused."""
+    from django.core.exceptions import ValidationError
+
+    value = (value or "").strip()
+    if not value:
+        return ""
+    if value.startswith("/") and not value.startswith("//"):
+        return value
+    if value.lower().startswith(("https://", "http://")) and len(value) > 10:
+        return value
+    raise ValidationError("Use a page on this site such as /shop/ or a full web address starting with https://")
+
+
+class LookbookSlide(TimeStampedModel):
+    """One image in the homepage lookbook carousel, with the words and button that appear when it is at the front."""
+
+    image = models.ImageField(upload_to="lookbook/", validators=[validate_image_extension, validate_image_size])
+    alt_text = models.CharField(max_length=200, blank=True, help_text="Describe the picture for people who can't see it.")
+    title = models.CharField("Headline", max_length=120)
+    subtitle = models.CharField("Subheadline", max_length=200, blank=True)
+    button_text = models.CharField(max_length=30, default="Shop now")
+    product = models.ForeignKey("catalog.Product", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                                help_text="Pick a product and the button opens its page. Or leave this empty and paste a link below.")
+    link_url = models.CharField("Other link", max_length=300, blank=True)
+    position = models.PositiveIntegerField(default=0, help_text="Lowest number comes first.")
+    is_active = models.BooleanField("Show on the homepage", default=True)
+
+    class Meta:
+        ordering = ["position", "id"]
+
+    def __str__(self):
+        return self.title
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        self.link_url = clean_link(self.link_url)
+        if not self.product_id and not self.link_url:
+            raise ValidationError("Choose a product or enter a link for the button.")
+
+    @property
+    def target_url(self):
+        if self.product_id:
+            return self.product.get_absolute_url()
+        return self.link_url
 
 
 class NewsletterSubscriber(TimeStampedModel):

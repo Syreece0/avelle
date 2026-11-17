@@ -307,7 +307,7 @@ class UserAccessForm(DashModelForm):
 
 
 # ------------------------------------------------------------------ website content
-from apps.content.models import SiteContent, SiteSettings  # noqa: E402
+from apps.content.models import LookbookSlide, SiteContent, SiteSettings  # noqa: E402
 
 HOME_BLOCKS = {
     "hero": {
@@ -398,7 +398,33 @@ class AnnouncementForm(DashModelForm):
         widgets = {"title": forms.TextInput(attrs={"maxlength": 200})}
 
 
+class LookbookSlideForm(DashModelForm):
+    class Meta:
+        model = LookbookSlide
+        fields = ["image", "alt_text", "title", "subtitle", "button_text", "product", "link_url", "position", "is_active"]
+        widgets = {"image": forms.ClearableFileInput(attrs={"accept": "image/*"})}
+        help_texts = {"image": "A portrait photo works best (about 4:5), up to 20 MB."}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from apps.catalog.models import Product
+
+        self.fields["product"].queryset = Product.objects.filter(status=Product.Status.PUBLISHED).order_by("name")
+        self.fields["product"].empty_label = "None: use the link below"
+        self.fields["button_text"].required = True
+
+
+class HeroStyleForm(DashModelForm):
+    class Meta:
+        model = SiteSettings
+        fields = ["hero_style"]
+        labels = {"hero_style": "Homepage hero"}
+        help_texts = {"hero_style": "“Photo or video” uses the Hero block under Homepage. “Lookbook carousel” needs at least 3 active slides; "
+                                    "with fewer, the photo or video hero is shown instead."}
+        widgets = {"hero_style": forms.RadioSelect}
+
+
 class SiteSettingsForm(DashModelForm):
     class Meta:
         model = SiteSettings
-        exclude = ["updated_at"]
+        exclude = ["updated_at", "hero_style"]

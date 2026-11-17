@@ -1,0 +1,39 @@
+{% load avelle_ui %}
+{# Lookbook carousel hero. The text for a slide is shown only while its picture is at the front (lookbook.js). #}
+<section class="lb" data-lookbook aria-roledescription="carousel" aria-label="Lookbook">
+  <div class="lb__blobs" aria-hidden="true"><span></span><span></span><span></span></div>
+  <h1 class="sr-only">AVELLE: {% for line in hero.lines %}{{ line }} {% endfor %}</h1>
+
+  <div class="container lb__inner">
+    <div class="lb__stage" data-lb-stage tabindex="0" role="group" aria-label="Lookbook pictures. Use the left and right arrow keys to change picture.">
+      <div class="lb__camera" data-lb-camera>
+        <div class="lb__ring" data-lb-ring>
+          {% for slide in lookbook %}
+            <button class="lb__card" type="button" data-lb-card aria-label="Show {{ slide.title }}">
+              <img src="{{ slide.image.url|cdn:640 }}" alt="{{ slide.alt_text|default:slide.title }}" width="480" height="600"
+                   {% if forloop.counter0 < 3 %}fetchpriority="{% if forloop.first %}high{% else %}auto{% endif %}"{% else %}loading="lazy"{% endif %} decoding="async" draggable="false">
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="lb__copy" data-lb-copy>
+      <p class="lb__count eyebrow" aria-hidden="true"><span data-lb-current>01</span> / {{ lookbook|length|stringformat:"02d" }}</p>
+      <div class="lb__texts" aria-live="polite" aria-atomic="true">
+        {% for slide in lookbook %}
+          <div class="lb__text" data-lb-text{% if forloop.first %} data-active="true"{% endif %}>
+            <h2 class="lb__title">{{ slide.title }}</h2>
+            {% if slide.subtitle %}<p class="lb__sub">{{ slide.subtitle }}</p>{% endif %}
+            <a class="btn btn--lg lb__btn" href="{{ slide.target_url }}"{% if slide.target_url|slice:":4" == "http" %} rel="noopener"{% endif %}>{{ slide.button_text }}</a>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="lb__controls" role="group" aria-label="Carousel controls">
+        <button class="lb__ctl" type="button" data-lb-prev aria-label="Previous picture">{% icon "chevron-left" "icon--sm" %}</button>
+        <button class="lb__ctl lb__ctl--wide" type="button" data-lb-toggle aria-pressed="false"><span data-lb-toggle-label>Pause</span></button>
+        <button class="lb__ctl" type="button" data-lb-next aria-label="Next picture">{% icon "chevron-right" "icon--sm" %}</button>
+      </div>
+    </div>
+  </div>
+</section>

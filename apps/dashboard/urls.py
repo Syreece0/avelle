@@ -62,6 +62,10 @@ urlpatterns = [
 
     path("content/", content.homepage, name="content_homepage"),
     path("content/homepage/<str:key>/", content.homepage_edit, name="content_homepage_edit"),
+    path("content/lookbook/", content.lookbook, name="content_lookbook"),
+    path("content/lookbook/new/", content.lookbook_edit, name="content_lookbook_new"),
+    path("content/lookbook/<int:pk>/", content.lookbook_edit, name="content_lookbook_edit"),
+    path("content/lookbook/<int:pk>/delete/", content.lookbook_delete, name="content_lookbook_delete"),
     path("content/pages/", content.pages, name="content_pages"),
     path("content/pages/new/", content.page_edit, name="content_page_new"),
     path("content/pages/<int:pk>/", content.page_edit, name="content_page_edit"),

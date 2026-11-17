@@ -5,6 +5,7 @@
 
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  {% if lookbook %}<link rel="stylesheet" href="{% static 'css/lookbook.css' %}">{% endif %}
   {# Hide the hero's reveal targets only when motion is allowed; a failsafe removes this if scripts are slow or blocked. #}
   <script>
     (function () {
@@ -30,4 +31,5 @@
 
 {% block scripts %}
   <script src="{% static 'js/home.js' %}" defer></script>
+  {% if lookbook %}<script src="{% static 'js/lookbook.js' %}" defer></script>{% endif %}
 {% endblock %}

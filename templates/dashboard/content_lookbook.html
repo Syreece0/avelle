@@ -1,0 +1,34 @@
+{% extends "dashboard/base.html" %}{% load avelle_ui %}
+{% block title %}Lookbook{% endblock %}
+{% block content %}
+{% url 'dashboard:content_lookbook_new' as new_url %}{% include "dashboard/_page_head.html" with title="Website content" subtitle="The images, headlines and buttons for the rotating homepage hero." action_url=new_url action_label="New slide" %}
+{% include "dashboard/_content_tabs.html" %}
+
+<section class="d-card" style="margin-bottom:16px"><div class="d-card__body">
+  <form method="post" data-loading-form>{% csrf_token %}
+    {% include "dashboard/_form_errors.html" with form=style_form %}
+    {% for field in style_form %}{% include "dashboard/_field.html" %}{% endfor %}
+    <button class="btn btn--secondary btn--sm" type="submit">Save hero choice</button>
+  </form>
+  <p class="muted" style="margin:12px 0 0">
+    {% if live %}The lookbook carousel is live on your homepage.
+    {% elif active_count < minimum %}{{ active_count }} of the {{ minimum }} slides needed are active. Until you have {{ minimum }}, visitors see the photo or video hero.
+    {% else %}The photo or video hero is showing. Choose “Lookbook carousel” above to switch.{% endif %}
+  </p>
+</div></section>
+
+<section class="d-card">
+  {% if slides %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Image</th><th>Headline</th><th>Button goes to</th><th>Order</th><th>Status</th><th class="actions"></th></tr></thead><tbody>
+    {% for s in slides %}<tr>
+      <td><div class="cell-product__thumb"><img src="{{ s.image.url|cdn:120 }}" alt="{{ s.alt_text }}" loading="lazy" width="44" height="54"></div></td>
+      <td><strong>{{ s.title }}</strong>{% if s.subtitle %}<br><span class="muted">{{ s.subtitle }}</span>{% endif %}</td>
+      <td>{{ s.button_text }}: {% if s.product %}{{ s.product.name }}{% else %}{{ s.link_url }}{% endif %}</td>
+      <td>{{ s.position }}</td>
+      <td>{% if s.is_active %}<span class="d-badge d-badge--paid">Active</span>{% else %}<span class="d-badge d-badge--cancelled">Hidden</span>{% endif %}</td>
+      <td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:content_lookbook_edit' s.pk %}">Edit</a></td>
+    </tr>{% endfor %}
+  </tbody></table></div>
+  <p class="muted" style="padding:0 20px 16px">Between {{ minimum }} and {{ maximum }} slides. Each slide shows its headline, subheadline and button only while its picture is at the front.</p>
+  {% else %}<div class="d-empty">{% icon "image" %}<h3>No slides yet</h3><p>Add at least {{ minimum }} slides, then choose “Lookbook carousel” above.</p></div>{% endif %}
+</section>
+{% endblock %}

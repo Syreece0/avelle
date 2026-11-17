@@ -1,3 +1,4 @@
+{% if lookbook %}{% include "home/_hero_lookbook.html" %}{% else %}
 {% load avelle_ui %}
 {# Cinematic hero. Title lines come from the admin (separated by "|"); each line is masked for the reveal. #}
 <section class="hero{% if not hero.image %} hero--typographic{% endif %}" data-hero aria-labelledby="hero-title">
@@ -28,3 +29,4 @@
 
   <a class="hero__scroll" href="#intro" data-hero-item><span>Scroll</span><span class="hero__scroll-line" aria-hidden="true"></span></a>
 </section>
+{% endif %}

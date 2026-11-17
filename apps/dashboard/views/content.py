@@ -7,11 +7,11 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
-from apps.content.models import NewsletterSubscriber, SiteContent, SiteSettings
+from apps.content.models import LOOKBOOK_MAX, LOOKBOOK_MIN, LookbookSlide, NewsletterSubscriber, SiteContent, SiteSettings
 
 from .. import rules
 from ..access import dashboard_required
-from ..forms import HOME_BLOCKS, AnnouncementForm, HomepageBlockForm, PageForm, SiteSettingsForm
+from ..forms import HOME_BLOCKS, AnnouncementForm, HeroStyleForm, HomepageBlockForm, LookbookSlideForm, PageForm, SiteSettingsForm
 from .common import clean_choice, keep_query, page, paginate
 from .reports import csv_response
 
@@ -19,7 +19,7 @@ Kind = SiteContent.Kind
 
 
 def _tabs(active):
-    return [("dashboard:content_homepage", "Homepage", "homepage"), ("dashboard:content_pages", "Pages", "pages"),
+    return [("dashboard:content_homepage", "Homepage", "homepage"), ("dashboard:content_lookbook", "Lookbook", "lookbook"), ("dashboard:content_pages", "Pages", "pages"),
             ("dashboard:content_announcements", "Announcements", "announcements"), ("dashboard:content_settings", "Contact & social", "settings")], active
 
 
@@ -47,6 +47,45 @@ def homepage_edit(request, key):
         return redirect("dashboard:content_homepage")
     return page(request, "dashboard/simple_form.html", "content", form=form, title=f"Edit: {HOME_BLOCKS[key]['label']}",
                 back=("dashboard:content_homepage", "Website content"), multipart=True)
+
+
+@dashboard_required("content")
+def lookbook(request):
+    settings_obj = SiteSettings.load()
+    style_form = HeroStyleForm(request.POST or None, instance=settings_obj)
+    if request.method == "POST" and style_form.is_valid():
+        style_form.save()
+        messages.success(request, "Homepage hero updated.")
+        return redirect("dashboard:content_lookbook")
+    slides = list(LookbookSlide.objects.select_related("product"))
+    active = sum(1 for slide in slides if slide.is_active)
+    return _content_page(request, "dashboard/content_lookbook.html", "lookbook", slides=slides, style_form=style_form,
+                         active_count=active, minimum=LOOKBOOK_MIN, maximum=LOOKBOOK_MAX,
+                         live=settings_obj.hero_style == SiteSettings.HeroStyle.CAROUSEL and active >= LOOKBOOK_MIN)
+
+
+@dashboard_required("content")
+def lookbook_edit(request, pk=None):
+    obj = get_object_or_404(LookbookSlide, pk=pk) if pk else LookbookSlide()
+    if not pk and LookbookSlide.objects.count() >= LOOKBOOK_MAX:
+        messages.error(request, f"The lookbook holds at most {LOOKBOOK_MAX} slides. Remove one first.")
+        return redirect("dashboard:content_lookbook")
+    form = LookbookSlideForm(request.POST or None, request.FILES or None, instance=obj)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Slide saved.")
+        return redirect("dashboard:content_lookbook")
+    return page(request, "dashboard/simple_form.html", "content", form=form, title="Edit slide" if pk else "New slide",
+                back=("dashboard:content_lookbook", "Lookbook"), multipart=True,
+                delete_url=f"/dashboard/content/lookbook/{pk}/delete/" if pk else "", delete_message="Delete this slide?" if pk else "")
+
+
+@dashboard_required("content")
+@require_POST
+def lookbook_delete(request, pk):
+    get_object_or_404(LookbookSlide, pk=pk).delete()
+    messages.success(request, "Slide deleted.")
+    return redirect("dashboard:content_lookbook")
 
 
 @dashboard_required("content")
