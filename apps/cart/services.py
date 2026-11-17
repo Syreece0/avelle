@@ -85,18 +85,22 @@ def add_item(cart, variant, quantity=1):
     if limit <= 0:
         raise CartError("Sorry, that size and colour is sold out.")
 
-    item, created = CartItem.objects.select_for_update().get_or_create(cart=cart, variant=variant, defaults={"quantity": 0})
-    wanted = item.quantity + quantity
+    # A row can never hold quantity 0 (database check constraint), so work out the final quantity first
+    # and only then create or update the row.
+    item = CartItem.objects.select_for_update().filter(cart=cart, variant=variant).first()
+    current = item.quantity if item else 0
+    wanted = current + quantity
     note = ""
     if wanted > limit:
-        if item.quantity >= limit:
-            if created:
-                item.delete()
+        if current >= limit:
             raise CartError(f"You already have the most we can offer of this item ({limit}).")
         wanted = limit
         note = f"Only {limit} available, so we've set the quantity to {limit}."
-    item.quantity = wanted
-    item.save(update_fields=["quantity", "updated_at"])
+    if item is None:
+        item = CartItem.objects.create(cart=cart, variant=variant, quantity=wanted)
+    else:
+        item.quantity = wanted
+        item.save(update_fields=["quantity", "updated_at"])
     return item, note
 
 
