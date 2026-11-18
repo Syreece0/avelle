@@ -1,7 +1,7 @@
 {% load avelle_ui %}
-{# Lookbook hero. Models stand in a row; the front one is large and sharp, the rest recede. The hero fades to the front look's colour,
+<!--{# Lookbook hero. Models stand in a row; the front one is large and sharp, the rest recede. The hero fades to the front look's colour,
    and that look's name, description and buy panel appear only while it is at the front (lookbook.js). #}
-{% with first=lookbook.0 %}
+{% with first=lookbook.0 %}-->
 <section class="lb" data-lookbook data-tone="{% if first.light_text %}light{% else %}dark{% endif %}" style="--lb-bg: {{ first.backdrop }}"
          aria-roledescription="carousel" aria-label="Lookbook">
   <div class="container">
