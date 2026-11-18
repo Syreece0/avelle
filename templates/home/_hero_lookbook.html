@@ -8,7 +8,7 @@
     <header class="lb__head">
       {% if hero.eyebrow %}<p class="lb__eyebrow eyebrow">{{ hero.eyebrow }}</p>{% endif %}
       <h1 class="lb__headline">{% for line in hero.lines %}<span>{{ line }}</span> {% endfor %}</h1>
-      {% if hero.body %}<p class="lb__lede">{{ hero.body }}</p>{% endif %}
+      {% if hero.body %}{% endif %}
     </header>
 
     <div class="lb__inner">
