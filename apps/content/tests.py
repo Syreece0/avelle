@@ -130,6 +130,7 @@ class LookbookDashboard(TestCase):
         self.assertEqual(response.status_code, 302, getattr(response, "context", None) and response.context["form"].errors)
         slide = LookbookSlide.objects.get()
         self.assertEqual(slide.target_url, "/shop/?category=men")
+        self.assertEqual(slide.backdrop, "#E9E1D2")          # no colour sent: the default ivory is used
 
     def test_slide_without_destination_is_rejected(self):
         response = self.client.post(reverse("dashboard:content_lookbook_new"), {
@@ -142,3 +143,111 @@ class LookbookDashboard(TestCase):
             make_slide(i)
         response = self.client.get(reverse("dashboard:content_lookbook_new"))
         self.assertEqual(response.status_code, 302)
+
+
+# ---------------------------------------------------------------- lookbook: colours and the buy panel
+class LookbookColours(TestCase):
+    def test_text_tone_follows_the_background(self):
+        from apps.content.colour import needs_light_text
+
+        self.assertTrue(needs_light_text("#1B2430"))      # navy
+        self.assertTrue(needs_light_text("#3A2C27"))      # espresso
+        self.assertFalse(needs_light_text("#E9E1D2"))     # ivory
+        self.assertFalse(needs_light_text("#C9A878"))     # tan
+
+    def test_every_accepted_backdrop_is_readable(self):
+        from apps.content.colour import best_contrast, is_readable
+
+        for r in range(0, 256, 15):
+            for g in range(0, 256, 15):
+                for b in range(0, 256, 15):
+                    colour = "#%02X%02X%02X" % (r, g, b)
+                    if is_readable(colour):
+                        self.assertGreaterEqual(best_contrast(colour), 4.5, colour)
+
+    def test_mid_tone_backdrop_is_refused(self):
+        from apps.content.colour import is_readable
+
+        self.assertFalse(is_readable("#767676"))
+        with self.assertRaises(ValidationError):
+            LookbookSlide(title="x", link_url="/shop/", image="a.png", backdrop="#767676").clean()
+
+    def test_backdrop_must_be_a_hex_colour(self):
+        slide = LookbookSlide(title="x", link_url="/shop/", image="a.png", backdrop="red")
+        with self.assertRaises(ValidationError):
+            slide.full_clean(exclude=["image", "product"])
+
+
+@override_settings(MEDIA_ROOT="/tmp/avelle-test-media")
+class LookbookBuyPanel(TestCase):
+    def setUp(self):
+        from apps.dashboard.tests import make_variant
+
+        self.variant = make_variant(stock=4)
+        for i in range(3):
+            make_slide(i, backdrop="#1B2430")
+        self.product_slide = make_slide(9, product=self.variant.product, link_url="")
+        settings_obj = SiteSettings.load()
+        settings_obj.hero_style = SiteSettings.HeroStyle.CAROUSEL
+        settings_obj.save()
+
+    def test_product_slide_gets_real_colours_sizes_and_stock(self):
+        from apps.core.homepage import build_lookbook
+
+        slides = {s.title: s for s in build_lookbook()}
+        panel = slides["Look 9"].panel
+        self.assertTrue(panel["buyable"] and panel["in_stock"])
+        self.assertEqual([c.name for c in panel["colours"]], ["Ivory"])
+        self.assertEqual([s.name for s in panel["sizes"]], ["M"])
+        self.assertEqual(panel["variants"][0]["qty"], 4)
+        self.assertIsNone(slides["Look 0"].panel)             # link-only slides get a plain button
+
+    def test_homepage_has_form_data_and_colours(self):
+        response = self.client.get("/")
+        self.assertContains(response, "data-lb-form")
+        self.assertContains(response, 'id="lb-data"')
+        self.assertContains(response, "#1B2430")
+        self.assertContains(response, 'data-tone="light"')
+
+    def test_draft_product_slide_is_skipped(self):
+        from apps.core.homepage import build_lookbook
+
+        self.variant.product.status = "draft"
+        self.variant.product.save()
+        self.assertNotIn("Look 9", [s.title for s in build_lookbook()])
+
+    def test_posting_the_panel_form_without_javascript_adds_to_bag(self):
+        v = self.variant
+        response = self.client.post(reverse("cart:add"), {"product": v.product_id, "size": v.size_id, "colour": v.colour_id})
+        self.assertEqual(response.status_code, 302)
+        from apps.cart.models import CartItem
+
+        self.assertEqual(CartItem.objects.get().variant_id, v.pk)
+
+
+@override_settings(MEDIA_ROOT="/tmp/avelle-test-media")
+class LookbookDashboardColour(TestCase):
+    def setUp(self):
+        self.client.force_login(CustomUser.objects.create_user(email="lb2@example.com", password="pw-12345-pw", first_name="A", last_name="B", role="manager"))
+
+    def post(self, **extra):
+        data = {"image": png_upload(), "title": "Look", "button_text": "Shop", "link_url": "/shop/", "position": "0", "is_active": "on",
+                "backdrop": "#1B2430", "backdrop_word": "WINTER"}
+        data.update(extra)
+        return self.client.post(reverse("dashboard:content_lookbook_new"), data)
+
+    def test_saves_colour_and_word(self):
+        self.assertEqual(self.post().status_code, 302)
+        slide = LookbookSlide.objects.get()
+        self.assertEqual((slide.backdrop, slide.backdrop_word), ("#1B2430", "WINTER"))
+
+    def test_malformed_colour_is_a_form_error_not_a_crash(self):
+        response = self.post(backdrop="not-a-colour")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(LookbookSlide.objects.count(), 0)
+
+    def test_hard_to_read_colour_is_rejected_with_a_message(self):
+        response = self.post(backdrop="#767676")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "hard to read")
+        self.assertEqual(LookbookSlide.objects.count(), 0)

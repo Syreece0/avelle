@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import RegexValidator
 
 from apps.core.models import TimeStampedModel
 from apps.core.storage import homepage_media_storage
@@ -112,6 +113,11 @@ class LookbookSlide(TimeStampedModel):
     product = models.ForeignKey("catalog.Product", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
                                 help_text="Pick a product and the button opens its page. Or leave this empty and paste a link below.")
     link_url = models.CharField("Other link", max_length=300, blank=True)
+    backdrop = models.CharField(
+        "Background colour", max_length=7, default="#E9E1D2",
+        validators=[RegexValidator(r"^#[0-9a-fA-F]{6}$", "Enter a colour such as #E9E1D2.")],
+        help_text="The whole hero fades to this colour while this look is at the front. Text switches between dark and light automatically.")
+    backdrop_word = models.CharField("Big background word", max_length=24, blank=True, help_text="Optional. A large, faint word behind the models, for example WINTER.")
     position = models.PositiveIntegerField(default=0, help_text="Lowest number comes first.")
     is_active = models.BooleanField("Show on the homepage", default=True)
 
@@ -121,10 +127,23 @@ class LookbookSlide(TimeStampedModel):
     def __str__(self):
         return self.title
 
+    @property
+    def light_text(self):
+        """Light text on a dark backdrop, chosen by contrast so the admin can never pick unreadable text."""
+        from .colour import needs_light_text
+
+        return needs_light_text(self.backdrop)
+
     def clean(self):
         from django.core.exceptions import ValidationError
 
         self.link_url = clean_link(self.link_url)
+        self.backdrop = (self.backdrop or "#E9E1D2").upper()
+        from .colour import HEX, is_readable
+
+        # A malformed value is reported by the field's own validator; only judge real hex colours here.
+        if HEX.match(self.backdrop) and not is_readable(self.backdrop):
+            raise ValidationError({"backdrop": "That mid-tone makes the text hard to read. Choose a lighter or a darker colour."})
         if not self.product_id and not self.link_url:
             raise ValidationError("Choose a product or enter a link for the button.")
 

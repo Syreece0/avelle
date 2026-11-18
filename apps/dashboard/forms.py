@@ -401,9 +401,16 @@ class AnnouncementForm(DashModelForm):
 class LookbookSlideForm(DashModelForm):
     class Meta:
         model = LookbookSlide
-        fields = ["image", "alt_text", "title", "subtitle", "button_text", "product", "link_url", "position", "is_active"]
-        widgets = {"image": forms.ClearableFileInput(attrs={"accept": "image/*"})}
-        help_texts = {"image": "A portrait photo works best (about 4:5), up to 20 MB."}
+        fields = ["image", "alt_text", "title", "subtitle", "button_text", "product", "link_url",
+                  "backdrop", "backdrop_word", "position", "is_active"]
+        widgets = {
+            "image": forms.ClearableFileInput(attrs={"accept": "image/*"}),
+            "backdrop": forms.TextInput(attrs={"type": "color", "style": "width:72px;height:44px;padding:2px"}),
+        }
+        labels = {"title": "Look name", "subtitle": "Short description"}
+        help_texts = {"image": "Best: the full-length model as a transparent PNG or WebP (background removed), standing, "
+                               "about 2:3 or 3:4 portrait, up to 20 MB. Ordinary photos work but show as a box.",
+                      "title": "Shown large in the panel, for example “The Midnight Puffer”."}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -412,6 +419,8 @@ class LookbookSlideForm(DashModelForm):
         self.fields["product"].queryset = Product.objects.filter(status=Product.Status.PUBLISHED).order_by("name")
         self.fields["product"].empty_label = "None: use the link below"
         self.fields["button_text"].required = True
+        self.fields["backdrop"].required = False       # left out: the model falls back to the default ivory
+        self.fields["backdrop"].initial = LookbookSlide._meta.get_field("backdrop").default
 
 
 class HeroStyleForm(DashModelForm):

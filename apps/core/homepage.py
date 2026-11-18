@@ -48,16 +48,42 @@ def _text(block, field, default_key, default_field):
     return value or DEFAULTS.get(default_key, {}).get(default_field, "")
 
 
+def _panel(product):
+    """Colours, sizes and stock for the buy panel of a product slide (one query set, prefetched)."""
+    variants = [v for v in product.variants.all() if v.is_active]
+    rows = []
+    for v in variants:
+        inventory = getattr(v, "inventory", None)
+        rows.append({"id": v.pk, "size": v.size_id, "colour": v.colour_id,
+                     "qty": inventory.quantity if inventory else 0, "price": str(v.unit_price)})
+    sizes = sorted({v.size for v in variants}, key=lambda s: (s.sort_order, s.name))
+    colours = sorted({v.colour for v in variants}, key=lambda c: (c.sort_order, c.name))
+    return {"variants": rows, "sizes": sizes, "colours": colours,
+            "in_stock": any(r["qty"] > 0 for r in rows), "buyable": bool(rows)}
+
+
 def build_lookbook():
-    """Slides for the carousel hero, or [] when the admin hasn't chosen it or has too few usable slides."""
+    """Slides for the carousel hero, or [] when the admin hasn't chosen it or has too few usable slides.
+
+    Each slide gets `.panel` (colours, sizes, stock) when it points at a published product with variants,
+    so the hero can offer a real add-to-bag. Anything else gets a plain shop button.
+    """
     if SiteSettings.load().hero_style != SiteSettings.HeroStyle.CAROUSEL:
         return []
+    queryset = LookbookSlide.objects.filter(is_active=True).select_related("product").prefetch_related(
+        "product__variants__size", "product__variants__colour", "product__variants__inventory")
     slides = []
-    for slide in LookbookSlide.objects.filter(is_active=True).select_related("product")[:LOOKBOOK_MAX]:
+    for slide in queryset[:LOOKBOOK_MAX]:
         if slide.product_id and slide.product.status != Product.Status.PUBLISHED:
             continue  # a draft product would lead to a 404
+        slide.panel = _panel(slide.product) if slide.product_id else None
         slides.append(slide)
     return slides if len(slides) >= LOOKBOOK_MIN else []
+
+
+def lookbook_data(slides):
+    """What lookbook.js needs per slide: backdrop colour and the variants for the buy panel."""
+    return [{"bg": s.backdrop, "variants": (s.panel or {}).get("variants", [])} for s in slides]
 
 
 def build_homepage_context():
@@ -108,9 +134,11 @@ def build_homepage_context():
         .filter(Q(ends_at__isnull=True) | Q(ends_at__gte=now))[:2]
     )
 
+    lookbook = build_lookbook()
     return {
         "hero": hero,
-        "lookbook": build_lookbook(),
+        "lookbook": lookbook,
+        "lookbook_data": lookbook_data(lookbook),
         "intro": intro,
         "editorial": editorial,
         "collections": collections,

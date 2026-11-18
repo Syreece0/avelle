@@ -1,39 +1,96 @@
 {% load avelle_ui %}
-{# Lookbook carousel hero. The text for a slide is shown only while its picture is at the front (lookbook.js). #}
-<section class="lb" data-lookbook aria-roledescription="carousel" aria-label="Lookbook">
-  <div class="lb__blobs" aria-hidden="true"><span></span><span></span><span></span></div>
-  <h1 class="sr-only">AVELLE: {% for line in hero.lines %}{{ line }} {% endfor %}</h1>
+{# Lookbook hero. Models stand in a row; the front one is large and sharp, the rest recede. The hero fades to the front look's colour,
+   and that look's name, description and buy panel appear only while it is at the front (lookbook.js). #}
+{% with first=lookbook.0 %}
+<section class="lb" data-lookbook data-tone="{% if first.light_text %}light{% else %}dark{% endif %}" style="--lb-bg: {{ first.backdrop }}"
+         aria-roledescription="carousel" aria-label="Lookbook">
+  <div class="container">
+    <header class="lb__head">
+      {% if hero.eyebrow %}<p class="lb__eyebrow eyebrow">{{ hero.eyebrow }}</p>{% endif %}
+      <h1 class="lb__headline">{% for line in hero.lines %}<span>{{ line }}</span> {% endfor %}</h1>
+      {% if hero.body %}<p class="lb__lede">{{ hero.body }}</p>{% endif %}
+    </header>
 
-  <div class="container lb__inner">
-    <div class="lb__stage" data-lb-stage tabindex="0" role="group" aria-label="Lookbook pictures. Use the left and right arrow keys to change picture.">
-      <div class="lb__camera" data-lb-camera>
-        <div class="lb__ring" data-lb-ring>
+    <div class="lb__inner">
+      <div class="lb__stage" data-lb-stage tabindex="0" role="group" aria-label="Lookbook. Use the left and right arrow keys to change look.">
+        <div class="lb__words" aria-hidden="true">
+          {% for slide in lookbook %}<span class="lb__word" data-lb-word>{{ slide.backdrop_word }}</span>{% endfor %}
+        </div>
+        <div class="lb__rim" aria-hidden="true" data-lb-rim></div>
+        <div class="lb__floor" aria-hidden="true"></div>
+        <div class="lb__track" data-lb-track>
           {% for slide in lookbook %}
             <button class="lb__card" type="button" data-lb-card aria-label="Show {{ slide.title }}">
-              <img src="{{ slide.image.url|cdn:640 }}" alt="{{ slide.alt_text|default:slide.title }}" width="480" height="600"
+              <img src="{{ slide.image.url|cdn:900 }}" alt="{{ slide.alt_text|default:slide.title }}" width="600" height="900"
                    {% if forloop.counter0 < 3 %}fetchpriority="{% if forloop.first %}high{% else %}auto{% endif %}"{% else %}loading="lazy"{% endif %} decoding="async" draggable="false">
             </button>
           {% endfor %}
         </div>
       </div>
+
+      <aside class="lb__panel" data-lb-panel aria-label="Look details">
+        <div class="lb__texts" aria-live="polite" aria-atomic="true">
+          {% for slide in lookbook %}
+            <div class="lb__text" data-lb-text{% if forloop.first %} data-active="true"{% endif %}>
+              <p class="lb__kicker eyebrow">Curated look · {{ forloop.counter|stringformat:"02d" }}/{{ lookbook|length|stringformat:"02d" }}</p>
+              <h2 class="lb__title">{{ slide.title }}</h2>
+              {% if slide.subtitle %}<p class="lb__sub">{{ slide.subtitle }}</p>{% endif %}
+
+              {% if slide.panel.buyable %}
+                <form class="lb__form" method="post" action="{% url 'cart:add' %}" data-lb-form novalidate>
+                  {% csrf_token %}<input type="hidden" name="product" value="{{ slide.product_id }}">
+                  {% if slide.panel.colours %}
+                  <fieldset class="lb__field">
+                    <legend>Colour <span data-lb-chosen="colour">{% if slide.panel.colours|length == 1 %}{{ slide.panel.colours.0.name }}{% endif %}</span></legend>
+                    <div class="lb__opts">
+                      {% for c in slide.panel.colours %}
+                        <label class="lb__opt lb__opt--swatch" title="{{ c.name }}">
+                          <input type="radio" name="colour" value="{{ c.pk }}" data-name="{{ c.name }}"{% if slide.panel.colours|length == 1 %} checked{% endif %}>
+                          <span class="lb__swatch" style="--swatch: {{ c.hex_code }}"></span><span class="sr-only">{{ c.name }}</span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  </fieldset>
+                  {% endif %}
+                  {% if slide.panel.sizes %}
+                  <fieldset class="lb__field">
+                    <legend>Size <span data-lb-chosen="size">{% if slide.panel.sizes|length == 1 %}{{ slide.panel.sizes.0.name }}{% endif %}</span></legend>
+                    <div class="lb__opts">
+                      {% for s in slide.panel.sizes %}
+                        <label class="lb__opt">
+                          <input type="radio" name="size" value="{{ s.pk }}" data-name="{{ s.name }}"{% if slide.panel.sizes|length == 1 %} checked{% endif %}>
+                          <span class="lb__chip">{{ s.name }}</span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  </fieldset>
+                  {% endif %}
+                  <p class="lb__price price"><span data-lb-price>{{ slide.product.current_price|naira }}</span>{% if slide.product.has_discount %} <s class="lb__was">{{ slide.product.price|naira }}</s>{% endif %}</p>
+                  <p class="lb__msg" role="status" aria-live="polite" data-lb-msg>{% if not slide.panel.in_stock %}Sold out{% endif %}</p>
+                  <div class="lb__actions">
+                    <button class="btn lb__btn" type="submit" data-lb-add{% if not slide.panel.in_stock %} disabled{% endif %}>{% icon "bag" "icon--sm" %} Add to bag</button>
+                    <a class="lb__more" href="{{ slide.target_url }}">{{ slide.button_text }} {% icon "arrow-right" "icon--sm" %}</a>
+                  </div>
+                </form>
+              {% else %}
+                <div class="lb__actions">
+                  <a class="btn lb__btn" href="{{ slide.target_url }}"{% if slide.target_url|slice:":4" == "http" %} rel="noopener"{% endif %}>{{ slide.button_text }}</a>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </aside>
     </div>
 
-    <div class="lb__copy" data-lb-copy>
-      <p class="lb__count eyebrow" aria-hidden="true"><span data-lb-current>01</span> / {{ lookbook|length|stringformat:"02d" }}</p>
-      <div class="lb__texts" aria-live="polite" aria-atomic="true">
-        {% for slide in lookbook %}
-          <div class="lb__text" data-lb-text{% if forloop.first %} data-active="true"{% endif %}>
-            <h2 class="lb__title">{{ slide.title }}</h2>
-            {% if slide.subtitle %}<p class="lb__sub">{{ slide.subtitle }}</p>{% endif %}
-            <a class="btn btn--lg lb__btn" href="{{ slide.target_url }}"{% if slide.target_url|slice:":4" == "http" %} rel="noopener"{% endif %}>{{ slide.button_text }}</a>
-          </div>
-        {% endfor %}
-      </div>
-      <div class="lb__controls" role="group" aria-label="Carousel controls">
-        <button class="lb__ctl" type="button" data-lb-prev aria-label="Previous picture">{% icon "chevron-left" "icon--sm" %}</button>
-        <button class="lb__ctl lb__ctl--wide" type="button" data-lb-toggle aria-pressed="false"><span data-lb-toggle-label>Pause</span></button>
-        <button class="lb__ctl" type="button" data-lb-next aria-label="Next picture">{% icon "chevron-right" "icon--sm" %}</button>
-      </div>
+    <div class="lb__controls" role="group" aria-label="Carousel controls">
+      <button class="lb__ctl" type="button" data-lb-prev aria-label="Previous look">{% icon "chevron-left" "icon--sm" %}</button>
+      <button class="lb__ctl lb__ctl--wide" type="button" data-lb-toggle aria-pressed="false"><span data-lb-toggle-label>Pause</span></button>
+      <button class="lb__ctl" type="button" data-lb-next aria-label="Next look">{% icon "chevron-right" "icon--sm" %}</button>
+      <span class="lb__progress" aria-hidden="true"><i data-lb-progress></i></span>
+      <span class="lb__count" aria-hidden="true"><span data-lb-current>01</span> / {{ lookbook|length|stringformat:"02d" }}</span>
     </div>
   </div>
+  {{ lookbook_data|json_script:"lb-data" }}
 </section>
+{% endwith %}

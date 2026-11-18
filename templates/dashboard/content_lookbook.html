@@ -18,17 +18,17 @@
 </div></section>
 
 <section class="d-card">
-  {% if slides %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Image</th><th>Headline</th><th>Button goes to</th><th>Order</th><th>Status</th><th class="actions"></th></tr></thead><tbody>
+  {% if slides %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Image</th><th>Look</th><th>Button goes to</th><th>Order</th><th>Status</th><th class="actions"></th></tr></thead><tbody>
     {% for s in slides %}<tr>
-      <td><div class="cell-product__thumb"><img src="{{ s.image.url|cdn:120 }}" alt="{{ s.alt_text }}" loading="lazy" width="44" height="54"></div></td>
+      <td><div class="cell-product__thumb" style="background:{{ s.backdrop }}"><img src="{{ s.image.url|cdn:120 }}" alt="{{ s.alt_text }}" loading="lazy" width="44" height="54"></div></td>
       <td><strong>{{ s.title }}</strong>{% if s.subtitle %}<br><span class="muted">{{ s.subtitle }}</span>{% endif %}</td>
       <td>{{ s.button_text }}: {% if s.product %}{{ s.product.name }}{% else %}{{ s.link_url }}{% endif %}</td>
-      <td>{{ s.position }}</td>
+      <td><span title="{{ s.backdrop }}" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:{{ s.backdrop }};border:1px solid rgba(0,0,0,.2);vertical-align:-2px"></span> {{ s.position }}</td>
       <td>{% if s.is_active %}<span class="d-badge d-badge--paid">Active</span>{% else %}<span class="d-badge d-badge--cancelled">Hidden</span>{% endif %}</td>
       <td class="actions"><a class="btn btn--secondary btn--sm" href="{% url 'dashboard:content_lookbook_edit' s.pk %}">Edit</a></td>
     </tr>{% endfor %}
   </tbody></table></div>
-  <p class="muted" style="padding:0 20px 16px">Between {{ minimum }} and {{ maximum }} slides. Each slide shows its headline, subheadline and button only while its picture is at the front.</p>
+  <p class="muted" style="padding:0 20px 16px">Between {{ minimum }} and {{ maximum }} slides. Each slide's name, description and buy panel show only while its model is at the front, and the whole hero fades to its background colour.</p>
   {% else %}<div class="d-empty">{% icon "image" %}<h3>No slides yet</h3><p>Add at least {{ minimum }} slides, then choose “Lookbook carousel” above.</p></div>{% endif %}
 </section>
 {% endblock %}
