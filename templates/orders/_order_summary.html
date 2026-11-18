@@ -2,7 +2,7 @@
 <ul class="mini-lines">
   {% for item in order.items.all %}
     <li><span class="mini-lines__img">{% if item.image_url %}<img src="{{ item.image_url }}" alt="" width="56" height="70">{% endif %}<span class="mini-lines__qty">{{ item.quantity }}</span></span>
-      <span class="mini-lines__name">{{ item.product_name }}<small>{{ item.colour_name }} · {{ item.size_name }}</small></span>
+      <span class="mini-lines__name">{{ item.product_name }}<small>{% if item.colour_name %}{{ item.colour_name }} · {% endif %}{{ item.size_name }}</small></span>
       <span class="price">{{ item.line_total|naira }}</span></li>
   {% endfor %}
 </ul>

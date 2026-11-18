@@ -20,7 +20,7 @@ from django.core.paginator import EmptyPage, Paginator
 from django.db.models import Case, Count, DecimalField, Exists, F, IntegerField, Max, Min, OuterRef, Q, Value, When
 from django.db.models.functions import Coalesce
 
-from apps.catalog.models import Brand, Category, Colour, Product, ProductVariant, Size
+from apps.catalog.models import STANDARD_COLOUR_NAME, Brand, Category, Colour, Product, ProductVariant, Size
 
 SORTS = {
     "newest": ("Newest", (F("published_at").desc(nulls_last=True), "-created_at", "-pk")),
@@ -329,7 +329,7 @@ def build_facets(base_qs, f, tree):
     scoped_colours |= set(f.colours)
     colour_options = [
         {"value": c.pk, "label": c.name, "hex": c.hex_code, "count": colour_counts.get(c.pk, 0), "selected": c.pk in f.colours}
-        for c in Colour.objects.filter(pk__in=scoped_colours).order_by("sort_order", "name")
+        for c in Colour.objects.filter(pk__in=scoped_colours).exclude(name=STANDARD_COLOUR_NAME).order_by("sort_order", "name")
     ]
 
     bounds = apply_filters(base_qs, f, tree, skip={"price"}).aggregate(low=Min("effective_price"), high=Max("effective_price"))

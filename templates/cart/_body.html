@@ -15,7 +15,7 @@
         <div class="cart-line__info">
           {% if line.product.brand %}<span class="pc__brand">{{ line.product.brand.name }}</span>{% endif %}
           <h2 class="cart-line__name"><a href="{{ line.product.get_absolute_url }}">{{ line.product.name }}</a></h2>
-          <p class="cart-line__meta">{{ line.variant.colour.name }} · {{ line.variant.size.name }}</p>
+          <p class="cart-line__meta">{{ line.variant.options_label }}</p>
           {% if not line.available %}<p class="cart-line__warn" role="alert">No longer available. Please remove it to continue.</p>
           {% elif line.stock <= 3 %}<p class="cart-line__low">Only {{ line.stock }} left</p>{% endif %}
           <p class="cart-line__unit price">{{ line.unit_price|naira }}</p>

@@ -5,7 +5,7 @@ from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
-from apps.catalog.models import Category, Inventory, Product, ProductImage, ProductVariant
+from apps.catalog.models import Category, Colour, Inventory, Product, ProductImage, ProductVariant
 
 from .. import services
 from ..access import dashboard_required
@@ -130,7 +130,7 @@ def variants_create(request, pk):
                     **_edit_context(product, variant_form=form))
     d = form.cleaned_data
     created, skipped = services.create_variants(
-        product, d["sizes"], d["colours"], price_override=d["price_override"], initial_stock=d["initial_stock"] or 0, user=request.user
+        product, d["sizes"], d["colours"] or [Colour.standard()], price_override=d["price_override"], initial_stock=d["initial_stock"] or 0, user=request.user
     )
     msg = f"{created} variant{'s' if created != 1 else ''} added."
     if skipped:

@@ -15,7 +15,7 @@
     <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Items</h2></div>
       <div class="d-table-wrap"><table class="d-table"><thead><tr><th>Product</th><th class="num">Price</th><th class="num">Qty</th><th class="num">Total</th></tr></thead><tbody>
         {% for i in items %}<tr><td><div class="cell-product"><div class="cell-product__thumb">{% if i.image_url %}<img src="{{ i.image_url }}" alt="" width="44" height="54" loading="lazy">{% else %}{% icon "shirt" %}{% endif %}</div>
-          <div><div class="cell-product__name">{% if i.product_id %}<a class="d-link" href="{% url 'dashboard:product_edit' i.product_id %}">{{ i.product_name }}</a>{% else %}{{ i.product_name }}{% endif %}</div><div class="cell-product__sub">{{ i.size_name }} · {{ i.colour_name }} · {{ i.sku }}</div></div></div></td>
+          <div><div class="cell-product__name">{% if i.product_id %}<a class="d-link" href="{% url 'dashboard:product_edit' i.product_id %}">{{ i.product_name }}</a>{% else %}{{ i.product_name }}{% endif %}</div><div class="cell-product__sub">{{ i.size_name }}{% if i.colour_name %} · {{ i.colour_name }}{% endif %} · {{ i.sku }}</div></div></div></td>
           <td class="num">{{ i.unit_price|naira }}</td><td class="num">{{ i.quantity }}</td><td class="num">{{ i.line_total|naira }}</td></tr>{% endfor %}
       </tbody></table></div>
       <div class="d-card__body"><dl class="totals">

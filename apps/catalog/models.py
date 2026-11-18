@@ -163,7 +163,13 @@ class Size(models.Model):
         return self.name
 
 
+STANDARD_COLOUR_NAME = "Standard"
+
+
 class Colour(models.Model):
+    """A product colour. "Standard" is the built-in stand-in for pieces that come in one colour only
+    (an Ankara print, say): customers are never asked to choose it and it is not shown to them."""
+
     name = models.CharField(max_length=50, unique=True)
     hex_code = models.CharField(
         max_length=7,
@@ -177,6 +183,14 @@ class Colour(models.Model):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def standard(cls):
+        return cls.objects.get_or_create(name=STANDARD_COLOUR_NAME, defaults={"hex_code": "#CFC6B6", "sort_order": 9999})[0]
+
+    @property
+    def is_standard(self):
+        return self.name == STANDARD_COLOUR_NAME
 
 
 class ProductQuerySet(models.QuerySet):
@@ -351,6 +365,13 @@ class ProductVariant(TimeStampedModel):
         if not self.sku:
             self.sku = f"AV{self.product_id:06d}-{self.size_id}-{self.colour_id}"
         super().save(*args, **kwargs)
+
+    @property
+    def options_label(self):
+        """What a customer should see for this variant: the colour only if there is a real choice of colours."""
+        parts = [] if self.colour.is_standard else [self.colour.name]
+        parts.append(self.size.name)
+        return " · ".join(parts)
 
     @property
     def unit_price(self):

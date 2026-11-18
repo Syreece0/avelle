@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from apps.catalog.models import (
-    Brand, Category, Colour, Inventory, Product, ProductImage, ProductVariant, Size, StockAdjustment,
+    STANDARD_COLOUR_NAME, Brand, Category, Colour, Inventory, Product, ProductImage, ProductVariant, Size, StockAdjustment,
 )
 from apps.core.forms import StyledFormMixin
 from apps.core.validators import validate_image_extension, validate_image_size
@@ -180,7 +180,10 @@ class ImageAltForm(DashModelForm):
 
 class VariantCreateForm(DashForm):
     sizes = forms.ModelMultipleChoiceField(queryset=Size.objects.all(), widget=forms.CheckboxSelectMultiple)
-    colours = forms.ModelMultipleChoiceField(queryset=Colour.objects.all(), widget=forms.CheckboxSelectMultiple)
+    colours = forms.ModelMultipleChoiceField(
+        queryset=Colour.objects.exclude(name=STANDARD_COLOUR_NAME), widget=forms.CheckboxSelectMultiple, required=False,
+        help_text="Optional. Tick colours only if this piece comes in several. Leave them all unticked for a single-colour piece "
+                  "(an Ankara print, for example) and customers won't be asked to choose a colour.")
     price_override = forms.DecimalField(required=False, min_value=Decimal("0.01"), max_digits=12, decimal_places=2,
                                         label="Price override (₦)", help_text="Leave empty to use the product's price.")
     initial_stock = forms.IntegerField(required=False, min_value=0, max_value=100000, initial=0,

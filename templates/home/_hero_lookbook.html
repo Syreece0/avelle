@@ -1,14 +1,14 @@
 {% load avelle_ui %}
-<!--{# Lookbook hero. Models stand in a row; the front one is large and sharp, the rest recede. The hero fades to the front look's colour,
+{# Lookbook hero. Models stand in a row; the front one is large and sharp, the rest recede. The hero fades to the front look's colour,
    and that look's name, description and buy panel appear only while it is at the front (lookbook.js). #}
-{% with first=lookbook.0 %}-->
+{% with first=lookbook.0 %}
 <section class="lb" data-lookbook data-tone="{% if first.light_text %}light{% else %}dark{% endif %}" style="--lb-bg: {{ first.backdrop }}"
          aria-roledescription="carousel" aria-label="Lookbook">
   <div class="container">
     <header class="lb__head">
       {% if hero.eyebrow %}<p class="lb__eyebrow eyebrow">{{ hero.eyebrow }}</p>{% endif %}
       <h1 class="lb__headline">{% for line in hero.lines %}<span>{{ line }}</span> {% endfor %}</h1>
-      {% if hero.body %}{% endif %}
+      {% if hero.body %}<p class="lb__lede">{{ hero.body }}</p>{% endif %}
     </header>
 
     <div class="lb__inner">
@@ -39,9 +39,11 @@
               {% if slide.panel.buyable %}
                 <form class="lb__form" method="post" action="{% url 'cart:add' %}" data-lb-form novalidate>
                   {% csrf_token %}<input type="hidden" name="product" value="{{ slide.product_id }}">
-                  {% if slide.panel.colours %}
+                  {% if slide.panel.colours|length == 1 %}
+                    <input type="radio" name="colour" value="{{ slide.panel.colours.0.pk }}" data-name="{{ slide.panel.colours.0.name }}" checked hidden>
+                  {% elif slide.panel.colours %}
                   <fieldset class="lb__field">
-                    <legend>Colour <span data-lb-chosen="colour">{% if slide.panel.colours|length == 1 %}{{ slide.panel.colours.0.name }}{% endif %}</span></legend>
+                    <legend>Colour <span data-lb-chosen="colour"></span></legend>
                     <div class="lb__opts">
                       {% for c in slide.panel.colours %}
                         <label class="lb__opt lb__opt--swatch" title="{{ c.name }}">

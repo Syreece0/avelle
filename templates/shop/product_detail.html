@@ -71,7 +71,8 @@
 
       <form class="pdp__form" data-pdp-form method="post" action="{% url 'cart:add' %}" novalidate>
         {% csrf_token %}<input type="hidden" name="product" value="{{ product.pk }}">
-        {% if colours %}
+        {% if colours|length == 1 %}<input type="radio" name="colour" value="{{ colours.0.pk }}" data-name="{{ colours.0.name }}" checked hidden>
+        {% elif colours %}
         <fieldset class="pdp__field" data-group="colour">
           <legend>Colour <span class="pdp__chosen" data-chosen="colour">{% if single_colour %}{{ colours.0.name }}{% endif %}</span></legend>
           <div class="option-group">

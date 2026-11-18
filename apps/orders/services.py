@@ -99,7 +99,7 @@ def create_order(*, user, summary, details, quote):
     OrderItem.objects.bulk_create([
         OrderItem(
             order=order, variant=line["variant"], product=line["product"], product_name=line["product"].name,
-            sku=line["variant"].sku, size_name=line["variant"].size.name, colour_name=line["variant"].colour.name,
+            sku=line["variant"].sku, size_name=line["variant"].size.name, colour_name="" if line["variant"].colour.is_standard else line["variant"].colour.name,
             image_url=line["image"].image.url if line["image"] else "",
             unit_price=line["unit_price"], quantity=line["quantity"], line_total=line["line_total"],
         )

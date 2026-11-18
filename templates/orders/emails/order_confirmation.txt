@@ -4,7 +4,7 @@ Thank you for your order. We've received your payment and are getting it ready.
 
 Order: {{ order.order_number }}
 
-{% for item in order.items.all %}{{ item.quantity }} x {{ item.product_name }} ({{ item.colour_name }}, {{ item.size_name }})  NGN {{ item.line_total|floatformat:2 }}
+{% for item in order.items.all %}{{ item.quantity }} x {{ item.product_name }} ({% if item.colour_name %}{{ item.colour_name }}, {% endif %}{{ item.size_name }})  NGN {{ item.line_total|floatformat:2 }}
 {% endfor %}
 Subtotal: NGN {{ order.subtotal|floatformat:2 }}{% if order.discount_amount %}
 Discount: -NGN {{ order.discount_amount|floatformat:2 }}{% endif %}
