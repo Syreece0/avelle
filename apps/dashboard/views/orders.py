@@ -5,6 +5,7 @@ from django.views.decorators.http import require_POST
 
 from apps.orders.models import Order
 from apps.payments.models import Payment
+from apps.payments.services import reconcile_order
 
 from .. import rules, services
 from ..access import can, dashboard_required
@@ -76,6 +77,19 @@ def order_status(request, number):
             messages.success(request, f"Order {order.order_number} updated.")
     else:
         return _detail(request, order, status_form=form)
+    return redirect("dashboard:order_detail", number=number)
+
+
+@dashboard_required("orders")
+@require_POST
+def order_check_payment(request, number):
+    order = get_object_or_404(Order, order_number=number)
+    if order.is_paid:
+        messages.info(request, "This order is already marked as paid.")
+    elif reconcile_order(order):
+        messages.success(request, "Paystack confirms the payment. The order is now marked as paid.")
+    else:
+        messages.warning(request, "Paystack has no successful payment for this order yet. If the customer paid by transfer, try again in a few minutes.")
     return redirect("dashboard:order_detail", number=number)
 
 

@@ -26,7 +26,8 @@
       </dl></div>
     </section>
 
-    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Payments</h2></div>
+    <section class="d-card"><div class="d-card__head"><h2 class="d-card__title">Payments</h2>
+      {% if order.status == "pending_payment" %}<form method="post" action="{% url 'dashboard:order_check_payment' order.order_number %}" data-loading-form>{% csrf_token %}<button class="btn btn--secondary btn--sm" type="submit">Check with Paystack</button></form>{% endif %}</div>
       {% if payments %}<div class="d-table-wrap"><table class="d-table"><thead><tr><th>Reference</th><th>Status</th><th>Channel</th><th class="num">Amount</th></tr></thead><tbody>
         {% for p in payments %}<tr><td>{{ p.reference }}<div class="cell-product__sub">{{ p.created_at|date:"j M, H:i" }}{% if p.gateway_response %} · {{ p.gateway_response }}{% endif %}</div></td>
           <td><span class="d-badge d-badge--{% if p.status == 'success' %}paid{% elif p.status == 'failed' %}refunded{% else %}pending{% endif %}">{{ p.get_status_display }}</span></td><td>{{ p.channel|default:"-" }}</td><td class="num">{{ p.amount|naira }}</td></tr>

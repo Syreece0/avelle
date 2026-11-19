@@ -55,3 +55,19 @@
 - The cache is per-process (LocMem); newsletter rate limiting is therefore per worker. Use Redis if you scale out.
 - The `starter` plan in `render.yaml` is a suggestion; use the plan you have.
 - Nothing here has been deployed or run against a real Render service from my side.
+
+## Payments that were paid but show "not completed"
+
+Paystack tells the site about a payment in two ways: the customer's browser returns to /payments/callback/, and
+Paystack calls /payments/webhook/ itself. Customers who pay by bank transfer often close the page, so only the
+webhook can mark the order paid. Check, in Paystack > Settings > API Keys & Webhooks (set it for **Live** mode too):
+
+- Live Webhook URL is exactly `https://avelle.onrender.com/payments/webhook/` (https, trailing slash, no www).
+- Render's `PAYSTACK_SECRET_KEY` is the **live** secret key (`sk_live_...`) that belongs to the same Paystack account.
+- In Render > Logs, a delivery shows as `POST /payments/webhook/ 200`. 401 means the wrong key, 301 means http or a
+  missing slash, 400 means ALLOWED_HOSTS.
+
+Safety nets built in: the order page re-checks Paystack whenever it is opened, customers and staff have a
+"Check payment" button, and `python manage.py reconcile_payments` (cron every 10-15 minutes on Render) fixes any
+unpaid order from the last 3 days that Paystack shows as paid. Orders are never cancelled for non-payment without
+asking Paystack first (`expire_unpaid_orders`).

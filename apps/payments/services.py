@@ -9,6 +9,7 @@ Safety properties:
   for an already-paid order is recorded as a duplicate needing a refund, never as a second sale.
 """
 import logging
+from datetime import timedelta
 
 from django.conf import settings
 from django.db import transaction
@@ -54,6 +55,33 @@ def start_payment(order):
     payment.authorization_url = data["authorization_url"]
     payment.save(update_fields=["authorization_url", "updated_at"])
     return payment.authorization_url
+
+
+def reconcile_order(order, *, max_attempts=4, timeout=8):
+    """Ask Paystack about every unsettled payment of an order and apply what it says.
+
+    This is the safety net for when the browser callback or the webhook never arrived (a bank transfer
+    paid in the banking app, a closed tab, a webhook URL that isn't set up). Returns True if the order is paid.
+    Never raises: a Paystack outage must not break the page that called it.
+    """
+    order.refresh_from_db()
+    if order.is_paid:
+        return True
+    cutoff = timezone.now() - timedelta(days=7)
+    attempts = (Payment.objects.filter(order=order, created_at__gte=cutoff).exclude(status=Payment.Status.SUCCESS)
+                .order_by("-created_at")[:max_attempts])
+    for payment in attempts:
+        try:
+            data = PaystackClient(settings.PAYSTACK_SECRET_KEY, settings.PAYSTACK_BASE_URL, timeout=timeout).verify(payment.reference)
+            apply_gateway_result(payment.pk, data)
+        except PaystackError as error:
+            log.warning("Could not reconcile %s: %s", payment.reference, error)
+        except Exception:  # noqa: BLE001
+            log.exception("Reconcile failed for %s", payment.reference)
+        order.refresh_from_db()
+        if order.is_paid:
+            return True
+    return False
 
 
 def verify_reference(reference):

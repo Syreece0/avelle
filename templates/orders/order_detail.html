@@ -14,6 +14,7 @@
       <div class="order__notice" role="status">
         <p><strong>Payment not completed.</strong> Your items aren't reserved until payment is received.</p>
         <form method="post" action="{% url 'orders:pay' order.order_number %}">{% csrf_token %}<button class="btn" type="submit" data-loading-form>Pay {{ order.total|naira }} now</button></form>
+        <form method="post" action="{% url 'orders:check_payment' order.order_number %}">{% csrf_token %}<p class="muted">Already paid, for example by bank transfer?</p><button class="btn btn--secondary" type="submit" data-loading-form>Check my payment</button></form>
       </div>
     {% elif order.is_paid %}
       <p class="lead">Thank you{% if order.customer_name %}, {{ order.customer_name|truncatechars:30 }}{% endif %}. We've emailed your confirmation to {{ order.email }}.</p>

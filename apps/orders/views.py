@@ -6,7 +6,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from apps.accounts.models import Address
 from apps.cart import services as cart_services
-from apps.payments.services import PaymentError, start_payment
+from apps.payments.services import PaymentError, reconcile_order, start_payment
 
 from . import services
 from .forms import CheckoutForm
@@ -97,11 +97,25 @@ def order_detail(request, number):
     order = get_object_or_404(Order.objects.prefetch_related("items", "status_history"), order_number=number)
     if not services.user_can_view(request, order):
         raise Http404()
+    if order.status == Order.Status.PENDING_PAYMENT:
+        reconcile_order(order)   # the customer may have paid by transfer without coming back to the site
     if order.is_paid:
         cart = cart_services.get_cart(request)
         if cart is not None and request.GET.get("paid") == "1":
             cart.items.all().delete()  # emptied once the customer has come back from a successful payment
     return render(request, "orders/order_detail.html", {"order": order, "section": "orders"})
+
+
+@require_POST
+def check_payment(request, number):
+    order = get_object_or_404(Order, order_number=number)
+    if not services.user_can_view(request, order):
+        raise Http404()
+    if reconcile_order(order):
+        messages.success(request, "Payment received. Thank you.")
+    else:
+        messages.info(request, "We haven't received that payment yet. Bank transfers can take a few minutes; please check again shortly.")
+    return redirect("orders:detail", number=order.order_number)
 
 
 @require_POST
