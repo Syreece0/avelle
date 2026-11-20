@@ -1,20 +1,20 @@
 {% load avelle_ui %}
-<!--{# Lookbook hero. Models stand in a row; the front one is large and sharp, the rest recede. The hero fades to the front look's colour,
+{# Lookbook hero. Models stand in a row; the front one is large and sharp, the rest recede. The hero fades to the front look's colour,
    and that look's name, description and buy panel appear only while it is at the front (lookbook.js). #}
-{% with first=lookbook.0 %}-->
+{% with first=lookbook.0 %}
 <section class="lb" data-lookbook data-tone="{% if first.light_text %}light{% else %}dark{% endif %}" style="--lb-bg: {{ first.backdrop }}"
          aria-roledescription="carousel" aria-label="Lookbook">
   <div class="container">
     <header class="lb__head">
       {% if hero.eyebrow %}<p class="lb__eyebrow eyebrow">{{ hero.eyebrow }}</p>{% endif %}
       <h1 class="lb__headline">{% for line in hero.lines %}<span>{{ line }}</span> {% endfor %}</h1>
-      {% if hero.body %}<!--<p class="lb__lede">{{ hero.body }}</p>-->{% endif %}
+      {% if hero.body %}<p class="lb__lede">{{ hero.body }}</p>{% endif %}
     </header>
 
     <div class="lb__inner">
       <div class="lb__stage" data-lb-stage tabindex="0" role="group" aria-label="Lookbook. Use the left and right arrow keys to change look.">
         <div class="lb__words" aria-hidden="true">
-          {% for slide in lookbook %}<span class="lb__word" data-lb-word>{{ slide.backdrop_word }}</span>{% endfor %}
+          {% for slide in lookbook %}<span class="lb__word" data-lb-word{% if forloop.first %} data-active="true"{% endif %}>{{ slide.backdrop_word }}</span>{% endfor %}
         </div>
         <div class="lb__rim" aria-hidden="true" data-lb-rim></div>
         <div class="lb__floor" aria-hidden="true"></div>

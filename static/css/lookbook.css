@@ -58,9 +58,10 @@
   grid-area: 1 / 1; font-family: var(--font-serif); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;
   font-size: clamp(5rem, 4rem + 14vw, 17rem); line-height: 1; opacity: 0; color: var(--lb-ink);
   transform: translate3d(calc(var(--lb-aim-x, 0) * -22px), calc(var(--lb-aim-y, 0) * -10px), 0);
+  transition: opacity 380ms var(--ease-out);
 }
-.lb__word:first-child { opacity: 0.07; }
-.lb--3d .lb__word:first-child { opacity: 0; }
+/* Only the look at the front shows its word; it fades out as soon as that look leaves. */
+.lb__word[data-active="true"] { opacity: 0.075; }
 .lb__rim {
   position: absolute; left: 50%; top: 46%; width: calc(var(--lb-stage-h) * 0.82); aspect-ratio: 1; border-radius: 50%;
   border: 1px solid var(--lb-line); pointer-events: none;

@@ -92,7 +92,6 @@
         card.style.filter = a < 0.35 ? "" : "blur(" + Math.min(2.6, a * 1.1).toFixed(2) + "px)";
         card.style.transform = "translate3d(calc(-50% + " + x.toFixed(1) + "px)," + (-Math.min(a, 2) * 12).toFixed(1) + "px,0) rotateY(" + turn.toFixed(2) + "deg) scale(" + scale.toFixed(3) + ")";
       }
-      if (words[i]) words[i].style.opacity = (0.075 * Math.max(0, 1 - a * 1.25)).toFixed(4);
     }
     root.style.setProperty("--lb-aim-x", aimX.toFixed(3));
     root.style.setProperty("--lb-aim-y", aimY.toFixed(3));
@@ -100,16 +99,20 @@
   }
 
   function showPanel(i) {
-    if (i === shown && texts[i].getAttribute("data-active") === "true") return;
+    if (i === shown && texts[i].getAttribute("data-active") === "true" && (!words[i] || words[i].getAttribute("data-active") === "true")) return;
     texts.forEach(function (el, k) {
       var on = k === i;
       if (on) el.setAttribute("data-active", "true"); else el.removeAttribute("data-active");
       el.setAttribute("aria-hidden", on ? "false" : "true");
     });
     shown = i;
+    words.forEach(function (el, k) { if (k === i) el.setAttribute("data-active", "true"); else el.removeAttribute("data-active"); });
     if (currentLabel) currentLabel.textContent = String(i + 1).padStart(2, "0");
   }
-  function hidePanel() { texts.forEach(function (el) { el.removeAttribute("data-active"); el.setAttribute("aria-hidden", "true"); }); }
+  function hidePanel() {
+    texts.forEach(function (el) { el.removeAttribute("data-active"); el.setAttribute("aria-hidden", "true"); });
+    words.forEach(function (el) { el.removeAttribute("data-active"); });   // the big background word goes with its look
+  }
 
   /* ---------- animation loop (runs only while something is moving) ---------- */
   function frame(now) {
